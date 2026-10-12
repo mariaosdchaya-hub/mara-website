@@ -53,6 +53,11 @@ const pixels = await Promise.all(
           <img src={pixels[i].coarse} alt="" class="step__img step__img--px step__img--coarse" loading="lazy" />
         </div>
         <p class="step__text" data-step-text>{s.text}</p>
+        <div class="step__back" aria-hidden="true" data-back>
+          <span class="back__num">( {s.n} )</span>
+          <img src="/logo.svg" alt="" width="89" height="20" class="back__logo" />
+          <span class="back__label">MVP process</span>
+        </div>
       </li>
     ))}
 
@@ -69,6 +74,11 @@ const pixels = await Promise.all(
       <span class="cta__corner cta__corner--tr" aria-hidden="true"></span>
       <span class="cta__corner cta__corner--bl" aria-hidden="true"></span>
       <span class="cta__corner cta__corner--br" aria-hidden="true"></span>
+        <div class="step__back" aria-hidden="true" data-back>
+          <span class="back__num">( 07 )</span>
+          <img src="/logo.svg" alt="" width="89" height="20" class="back__logo" />
+          <span class="back__label">MVP process</span>
+        </div>
     </li>
   </ol>
 </section>
@@ -183,6 +193,34 @@ const pixels = await Promise.all(
     object-fit: var(--fit);
   }
   .step__img--px { image-rendering: pixelated; opacity: 0; }
+
+  /* card back: shown while the cards lie face down in the pile (see process-motion.ts) */
+  .step__back {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px;
+    background:
+      linear-gradient(rgba(121, 242, 255, .07) 1px, transparent 1px) 0 0 / 24px 24px,
+      linear-gradient(90deg, rgba(121, 242, 255, .07) 1px, transparent 1px) 0 0 / 24px 24px,
+      #141414;
+    border: 1px solid #2a2b2e;
+    color: #79f2ff;
+    font-size: 12px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    /* the card is rotated 180° while face down, so mirror the back to read correctly */
+    transform: scaleX(-1);
+  }
+  .is-dealing .step__back { display: flex; opacity: 0; }
+  .back__logo { width: 96px; height: auto; opacity: .9; }
+  .back__label { color: #6b6b70; }
+  .is-dealing .process__grid { perspective: 2400px; }
+  .is-dealing .step { will-change: transform; backface-visibility: visible; }
 
   /* CTA card */
   .step--cta {
