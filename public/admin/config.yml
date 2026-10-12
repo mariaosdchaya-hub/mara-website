@@ -1,0 +1,56 @@
+# Mara site content. Edit cases at /admin.
+# Saving commits to GitHub; Netlify rebuilds the site automatically (~1 min).
+backend:
+  name: github
+  repo: OWNER/mara-site # ← GitHub user/repo, set once the repo exists
+  branch: main
+  commit_messages:
+    create: "Add case: {{slug}}"
+    update: "Update case: {{slug}}"
+    delete: "Remove case: {{slug}}"
+
+site_url: https://mara-studio-xfu0.netlify.app
+display_url: https://mara-studio-xfu0.netlify.app
+
+# images live next to the code so Astro can optimise them (webp, responsive sizes)
+media_folder: src/assets/cases
+public_folder: ../../assets/cases
+
+collections:
+  - name: cases
+    label: Cases
+    label_singular: Case
+    folder: src/content/cases
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    summary: "{{order}} · {{title}}"
+    sortable_fields: [order, title]
+    media_folder: ../../assets/cases
+    public_folder: ../../assets/cases
+    fields:
+      - { name: title, label: Title, widget: string }
+      - name: summary
+        label: Short result line
+        widget: string
+        hint: "One line under the title, e.g. “AI medical assistant. From idea to clickable MVP in 8 weeks.”"
+      - name: tags
+        label: Tags
+        widget: list
+        allow_add: true
+        hint: "2–3 tags shown on the card, e.g. AI, Healthtech, MVP"
+      - name: cover
+        label: Cover image
+        widget: image
+        hint: "Landscape, at least 2000 × 1056 px (card is 1002 × 529). Keep the subject centred, mobile crops to 4:5."
+      - { name: coverAlt, label: Cover description (alt text), widget: string, required: false }
+      - { name: link, label: Case link, widget: string, default: "#", hint: "Behance or case page URL" }
+      - name: order
+        label: Position in the stack
+        widget: number
+        value_type: int
+        default: 100
+        hint: "1 = first card. Lower numbers come first."
+      - { name: featured, label: Show in Selected work, widget: boolean, default: true }
+      - { name: draft, label: Draft (hidden from site), widget: boolean, default: false }

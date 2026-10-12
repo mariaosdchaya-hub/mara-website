@@ -1,0 +1,28 @@
+---
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Hero from "../components/Hero.astro";
+import SelectedWork from "../components/SelectedWork.astro";
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mara — design, branding & front-end studio</title>
+    <meta name="description" content="Mara is a design, branding and front-end studio that takes startups from idea to shipped product." />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="preload" as="image" href="/hero/hero-poster.jpg" fetchpriority="high" />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <Hero />
+      <SelectedWork />
+    </main>
+  </body>
+</html>

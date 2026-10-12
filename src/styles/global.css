@@ -1,0 +1,72 @@
+/* Mara design tokens (from Figma "Mara Type" styles + colors) */
+:root {
+  --c-black: #000000;
+  --c-near-black: #1a1a1a;
+  --c-charcoal: #303236;
+  --c-gray-600: #61646b;
+  --c-gray-350: #afb1b6;
+  --c-gray-300: #c9cbcf;
+  --c-white: #ffffff;
+  --c-teal: #5dbdc7;
+
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* type scale */
+  --t-display: 56px;
+  --t-body: 16px;
+  --t-small: 14px;
+  --t-overline: 12px;
+
+  --gutter: 32px;
+  --max: 1440px;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--c-black);
+  color: var(--c-white);
+  font-family: var(--font);
+  font-size: var(--t-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color .2s, border-color .2s, color .2s;
+  border: 1px solid transparent;
+}
+.btn--sm { height: 36px; padding: 0 18px; font-size: var(--t-small); line-height: 1.45; }
+.btn--md { height: 44px; padding: 0 32px; font-size: var(--t-body); }
+.btn--primary { background: var(--c-white); color: var(--c-near-black); }
+.btn--primary:hover { background: var(--c-gray-300); }
+.btn--ghost { background: transparent; color: var(--c-white); border-color: var(--c-gray-600); font-weight: 400; }
+.btn--ghost:hover { border-color: var(--c-white); }
+.btn--sm.btn--ghost { font-weight: 500; }
+
+.overline {
+  font-size: var(--t-overline);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}

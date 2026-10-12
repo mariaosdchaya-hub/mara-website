@@ -1,0 +1,245 @@
+---
+import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
+
+const cases = (await getCollection("cases", ({ data }) => !data.draft && data.featured)).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+const count = cases.length;
+---
+<section class="work" id="work" data-work>
+  <div class="work__head">
+    <h2 class="work__title" data-reveal>Selected projects<br />&amp; work</h2>
+    <p class="work__note" data-reveal>Products we took from idea to shipped — fintech, AI, web3 and SaaS.</p>
+  </div>
+
+  <div class="stack" data-stack style={`--count:${count}`}>
+    <div class="stack__meta stack__meta--left" aria-hidden="true">
+      <span class="stack__label">Project</span>
+      <span class="stack__name" data-stack-name>{cases[0]?.data.title}</span>
+    </div>
+    <div class="stack__meta stack__meta--right" aria-hidden="true">
+      <span class="stack__label"><span data-stack-index>01</span> / {String(count).padStart(2, "0")}</span>
+      <span class="stack__name">{count} projects</span>
+    </div>
+
+    <ul class="stack__stage" role="list">
+      {cases.map((c, i) => (
+        <li class="card" data-card style={`--i:${i}`}>
+          <a class="card__link" href={c.data.link} data-title={c.data.title}>
+            <Image
+              class="card__img"
+              src={c.data.cover}
+              alt={c.data.coverAlt}
+              widths={[640, 1002, 1504, 2004]}
+              sizes="(max-width: 768px) 92vw, 1002px"
+              loading={i < 3 ? "eager" : "lazy"}
+              decoding="async"
+            />
+            {c.data.tags.length > 0 && (
+              <ul class="card__tags" role="list">
+                {c.data.tags.map((t) => <li>{t}</li>)}
+              </ul>
+            )}
+            <div class="card__info">
+              <div class="card__text">
+                <h3 class="card__title">{c.data.title}</h3>
+                <p class="card__summary">{c.data.summary}</p>
+              </div>
+              <span class="card__arrow" aria-hidden="true">
+                <svg width="56" height="56" viewBox="0 0 56 56"><rect width="56" height="56" rx="4" fill="#fff" /><path d="M23.67 33.45l-1.11-1.11 8.24-8.25h-6.37l.02-1.54h8.99v9.01h-1.55l.02-6.37-8.24 8.26z" fill="#141414" /></svg>
+              </span>
+            </div>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .work {
+    position: relative;
+    background: #fff;
+    color: #0d221a;
+    padding: 96px 56px 0;
+  }
+  .work__head {
+    max-width: 1328px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 32px;
+  }
+  .work__title {
+    margin: 0;
+    font-size: 48px;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .work__note {
+    margin: 0;
+    max-width: 486px;
+    font-size: 18px;
+    line-height: 1.5;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    color: #6b6b70;
+  }
+
+  /* ---------- stack ---------- */
+  .stack {
+    /* deck spans ~1.62 card heights (strips above + below), so width is also capped by viewport height */
+    --ratio: calc(529 / 1002);
+    --card-w: min(1002px, 70vw, (100svh - var(--header-h, 64px) - 64px) * 1.17);
+    position: relative;
+    height: calc(100svh - var(--header-h, 64px));
+    min-height: 620px;
+    max-width: 1328px;
+    margin: 0 auto;
+  }
+  .stack__stage {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .card {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--card-w);
+    aspect-ratio: 1002 / 529;
+    margin-left: calc(var(--card-w) / -2);
+    /* open card sits a little above centre so the deeper strips below fit */
+    margin-top: calc(var(--card-w) * var(--ratio) * -0.61);
+    backface-visibility: hidden;
+    will-change: transform, opacity;
+  }
+  .card__link {
+    position: absolute;
+    inset: 0;
+    display: block;
+    overflow: hidden;
+    background: #f6f6f7;
+    color: #fff;
+    outline-offset: 4px;
+  }
+  .card__link:focus-visible { outline: 2px solid #0d221a; }
+  .card__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* depth shade, driven by JS (--shade 0..1) */
+  .card__link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #000;
+    opacity: var(--shade, 0);
+    pointer-events: none;
+  }
+  .card__tags {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    display: flex;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .card__tags li {
+    height: 32px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, .33);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .card__info {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 43%;
+    padding: 48px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .card__info::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .78) 100%);
+    pointer-events: none;
+  }
+  .card__text { position: relative; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .card__title {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+  .card__summary { margin: 0; color: #bfbfc6; font-size: 16px; line-height: 1.5; }
+  .card__arrow { position: relative; flex: none; transition: transform .3s cubic-bezier(.2, .7, .2, 1); }
+  .card__link:hover .card__arrow { transform: translate(2px, -2px); }
+
+  .stack__meta {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 14px;
+    line-height: 1.45;
+    z-index: 200;
+    pointer-events: none;
+  }
+  .stack__meta--left { left: 0; }
+  .stack__meta--right { right: 0; text-align: right; }
+  .stack__label { color: #6b6b70; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
+  .stack__name { color: #0d221a; }
+
+  /* no-JS / reduced motion: simple vertical list */
+  .work:not(.is-3d) .stack { height: auto; min-height: 0; padding: 64px 0 120px; }
+  .work:not(.is-3d) .stack__stage { position: static; display: grid; gap: 24px; perspective: none; }
+  .work:not(.is-3d) .card { position: relative; left: auto; top: auto; margin: 0 auto; width: min(1002px, 100%); }
+  .work:not(.is-3d) .stack__meta { display: none; }
+
+  @media (max-width: 1100px) {
+    .work { padding: 80px 32px 0; }
+    .stack__meta { display: none; }
+    .stack { --card-w: min(1002px, 84vw, (100svh - var(--header-h, 64px) - 64px) * 1.17); }
+  }
+  @media (max-width: 768px) {
+    .work { padding: 72px 16px 0; }
+    .work__head { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .work__title { font-size: 36px; }
+    .work__note { font-size: 14px; }
+    .stack { --ratio: 1.25; --card-w: min(100vw - 32px, (100svh - var(--header-h, 64px) - 48px) * .49); min-height: 520px; }
+    .card { aspect-ratio: 4 / 5; }
+    .card__info { padding: 20px; height: 55%; }
+    .card__title { font-size: 24px; }
+    .card__summary { font-size: 14px; }
+    .card__tags { top: 16px; right: 16px; }
+    .card__tags li { height: 28px; padding: 4px 10px; font-size: 13px; }
+    .card__arrow svg { width: 44px; height: 44px; }
+  }
+</style>
+
+<script>
+  import { initWorkStack } from "../scripts/work-stack";
+  const cleanup = initWorkStack();
+  document.addEventListener("astro:before-swap", () => cleanup?.(), { once: true });
+</script>
