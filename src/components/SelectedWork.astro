@@ -117,6 +117,8 @@ const count = cases.length;
     /* open card sits a little above centre so the deeper strips below fit */
     margin-top: calc(var(--card-w) * var(--ratio) * -0.61);
     backface-visibility: hidden;
+    /* soft contact shadow so each sheet reads as lying on the one behind */
+    box-shadow: 0 -6px 18px rgba(0, 0, 0, .14), 0 10px 24px rgba(0, 0, 0, .16);
     will-change: transform, opacity;
   }
   .card__link {

@@ -17,6 +17,8 @@ gsap.registerPlugin(ScrollTrigger);
 const ABOVE = [1, 0.13, 0.065, 0.035, 0.018]; // d = 0, -1, -2, -3, -4
 const BELOW = [1, 0.2, 0.13, 0.09, 0.06]; // d = 0, +1, +2, +3, +4
 const SHADE = [0, 0.1, 0.2, 0.3, 0.38];
+// how far each folded card tucks under its neighbour (card heights), so sheets overlap like a pile
+const TUCK = 0.07;
 const MAX = 4;
 
 // cumulative edge position of the k-th strip (k >= 1), in card heights
@@ -28,7 +30,7 @@ const edge = (list: number[], k: number) => {
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-type Pose = { top: number; h: number; origin: "top" | "bottom"; shade: number; o: number };
+type Pose = { top: number; h: number; origin: "top" | "bottom"; shade: number; o: number; tuck: number };
 
 // top = y of the card's visual top edge (card heights, 0 = open card top), h = visible height
 function poseAt(d: number): Pose {
@@ -43,14 +45,18 @@ function poseAt(d: number): Pose {
     const bottomHi = -edge(ABOVE, hi - 1);
     const bottom = lerp(bottomLo, bottomHi, t);
     const h = lerp(ABOVE[lo], ABOVE[hi], t);
-    return { top: bottom - h, h, origin: "bottom", shade: lerp(SHADE[lo], SHADE[hi], t), o: fade };
+    const tuck = Math.min(a, 1) * TUCK;
+    // hinge sits `tuck` below the visible edge, hidden under the card in front
+    return { top: bottom - h, h: h + tuck, origin: "bottom", shade: lerp(SHADE[lo], SHADE[hi], t), o: fade, tuck };
   }
   // below: top edge hangs from the strip above it
   const topLo = lo === 0 ? 0 : 1 + edge(BELOW, lo - 1);
   const topHi = 1 + edge(BELOW, hi - 1);
+  const tuck = Math.min(a, 1) * TUCK;
   return {
-    top: lerp(topLo, topHi, t),
-    h: lerp(BELOW[lo], BELOW[hi], t),
+    top: lerp(topLo, topHi, t) - tuck,
+    h: lerp(BELOW[lo], BELOW[hi], t) + tuck,
+    tuck,
     origin: "top",
     shade: lerp(SHADE[lo], SHADE[hi], t),
     o: fade,
@@ -118,7 +124,7 @@ export function initWorkStack() {
       const toward = P.origin === "top";
       const angle = foldAngle(P.h, H, toward);
       // CSS rotateX(+): top edge recedes / bottom edge comes forward — right for both hinges
-      const ty = P.origin === "bottom" ? (P.top + P.h - 1) * H : P.top * H;
+      const ty = P.origin === "bottom" ? (P.top + P.h - 1) * H : P.top * H; // P.h already includes the tucked part
       el.style.transformOrigin = P.origin === "bottom" ? "50% 100%" : "50% 0%";
       el.style.transform = `translate3d(0, ${ty}px, 0) perspective(${PERSP}px) rotateX(${angle}deg)`;
       el.style.opacity = String(P.o);
