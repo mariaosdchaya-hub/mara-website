@@ -53,11 +53,14 @@ const pixels = await Promise.all(
           <img src={pixels[i].coarse} alt="" class="step__img step__img--px step__img--coarse" loading="lazy" />
         </div>
         <p class="step__text" data-step-text>{s.text}</p>
-        <div class="step__back" aria-hidden="true" data-back>
-          <span class="back__num">( {s.n} )</span>
-          <img src="/logo.svg" alt="" width="89" height="20" class="back__logo" />
-          <span class="back__label">MVP process</span>
+        <div class="skel" aria-hidden="true" data-skel>
+          <span class="skel__bar skel__bar--title"></span>
+          <span class="skel__bar skel__bar--num"></span>
+          <span class="skel__block"></span>
+          <span class="skel__bar skel__bar--l1"></span>
+          <span class="skel__bar skel__bar--l2"></span>
         </div>
+        <span class="step__load" aria-hidden="true" data-load></span>
       </li>
     ))}
 
@@ -74,11 +77,14 @@ const pixels = await Promise.all(
       <span class="cta__corner cta__corner--tr" aria-hidden="true"></span>
       <span class="cta__corner cta__corner--bl" aria-hidden="true"></span>
       <span class="cta__corner cta__corner--br" aria-hidden="true"></span>
-        <div class="step__back" aria-hidden="true" data-back>
-          <span class="back__num">( 07 )</span>
-          <img src="/logo.svg" alt="" width="89" height="20" class="back__logo" />
-          <span class="back__label">MVP process</span>
+        <div class="skel skel--dark" aria-hidden="true" data-skel>
+          <span class="skel__bar skel__bar--title"></span>
+          <span class="skel__bar skel__bar--num"></span>
+          <span class="skel__block"></span>
+          <span class="skel__bar skel__bar--l1"></span>
+          <span class="skel__bar skel__bar--l2"></span>
         </div>
+        <span class="step__load" aria-hidden="true" data-load></span>
     </li>
   </ol>
 </section>
@@ -194,33 +200,49 @@ const pixels = await Promise.all(
   }
   .step__img--px { image-rendering: pixelated; opacity: 0; }
 
-  /* card back: shown while the cards lie face down in the pile (see process-motion.ts) */
-  .step__back {
+  /* loading state: skeleton placeholders + a thin progress line (see process-motion.ts) */
+  .skel {
     position: absolute;
     inset: 0;
     z-index: 4;
     display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: 24px;
-    background:
-      linear-gradient(rgba(121, 242, 255, .07) 1px, transparent 1px) 0 0 / 24px 24px,
-      linear-gradient(90deg, rgba(121, 242, 255, .07) 1px, transparent 1px) 0 0 / 24px 24px,
-      #141414;
-    border: 1px solid #2a2b2e;
-    color: #79f2ff;
-    font-size: 12px;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-    /* the card is rotated 180° while face down, so mirror the back to read correctly */
-    transform: scaleX(-1);
+    padding: 28px;
+    background: #f6f6f7;
+    pointer-events: none;
   }
-  .is-dealing .step__back { display: flex; opacity: 0; }
-  .back__logo { width: 96px; height: auto; opacity: .9; }
-  .back__label { color: #6b6b70; }
-  .is-dealing .process__grid { perspective: 2400px; }
-  .is-dealing .step { will-change: transform; backface-visibility: visible; }
+  .is-loading .skel { display: block; }
+  .skel > span {
+    position: absolute;
+    border-radius: 3px;
+    background: linear-gradient(100deg, #e9e9ec 30%, #f4f4f6 50%, #e9e9ec 70%) 0 0 / 300% 100%;
+    animation: skel-shimmer 1.4s linear infinite;
+  }
+  .skel__bar--title { left: 28px; top: 32px; width: 38%; height: 22px; }
+  .skel__bar--num { right: 28px; top: 34px; width: 22px; height: 16px; }
+  .skel__block { left: 50%; top: 22%; width: min(62%, 300px); height: 44%; transform: translateX(-50%); }
+  .skel__bar--l1 { left: 28px; bottom: 54px; width: 78%; height: 12px; }
+  .skel__bar--l2 { left: 28px; bottom: 32px; width: 52%; height: 12px; }
+  .skel--dark { background: #141414; padding: 32px; }
+  .skel--dark > span { background-image: linear-gradient(100deg, #222326 30%, #2e3034 50%, #222326 70%); }
+  .skel--dark .skel__bar--num, .skel--dark .skel__block { display: none; }
+  .skel--dark .skel__bar--title { top: 32px; left: 32px; width: 34%; height: 12px; }
+  .skel--dark .skel__bar--l1 { top: 60px; bottom: auto; left: 32px; width: 70%; height: 26px; }
+  .skel--dark .skel__bar--l2 { top: auto; bottom: 32px; left: 32px; width: 46%; height: 44px; }
+  @keyframes skel-shimmer { from { background-position: 100% 0; } to { background-position: -50% 0; } }
+  .step__load {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 5;
+    width: 100%;
+    height: 2px;
+    background: #0d221a;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .step--cta .step__load { background: #79f2ff; }
 
   /* CTA card */
   .step--cta {

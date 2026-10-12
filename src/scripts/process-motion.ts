@@ -1,43 +1,34 @@
 /**
  * MVP process — entrance.
  *
- * Heading (all sizes): lines rise out of a mask while un-blurring, the overline fades in from a blur
+ * Heading: lines rise out of a mask while un-blurring, the overline fades in from a blur
  * (matched to the LE:MA reference transition after the cases deck).
  *
- * Cards, desktop — "dealing the deck": the grid pins and all seven cards start face down
- * in one loose pile in the middle. Scrolling deals them one by one, 01 → 07: each card lifts
- * off the pile, flies to its slot, grows to its real size and flips face up on the way;
- * its illustration lands as coarse pixels and resolves to sharp. Fully scrubbed, so
- * scrolling back gathers the cards into the pile again.
- *
- * Cards, tablet/phone: each card rises and tilts up into place as it enters the viewport,
- * the panel unrolls from the top and the illustration de-pixelates.
+ * Cards "load" one after another, like content arriving in an app:
+ *  1. the card appears as a skeleton (shimmering placeholders) with a thin progress line on top,
+ *  2. the line fills in a couple of uneven steps,
+ *  3. the skeleton dissolves into the real content: title and number sharpen,
+ *     the illustration arrives as coarse pixels and resolves to sharp, the description fades in last.
+ * Time-based (not scrubbed); desktop plays row by row, phones card by card.
  */
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// pile size (px) and the slight disorder of the cards in it
-const PILE_W = 250;
-const PILE_H = 330;
-const PILE_ROT = [-5, 4, -2, 6, -7, 3, 0];
-const PILE_X = [-10, 8, -4, 12, -14, 6, 0];
-const PILE_Y = [6, -8, 4, -4, 10, -6, 0];
-const DEAL_GAP = 0.55; // timeline units between two deals
-const DEAL_LEN = 1.1; // one card's flight
+const CARD_GAP = 0.14; // delay between neighbouring cards in a row
 
 export function initProcess() {
   const section = document.querySelector<HTMLElement>("[data-process]");
   if (!section) return;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-  const grid = section.querySelector<HTMLElement>(".process__grid")!;
   const lines = section.querySelectorAll<HTMLElement>("[data-split] .line > span");
   const fades = section.querySelectorAll<HTMLElement>("[data-fade]");
   const steps = Array.from(section.querySelectorAll<HTMLElement>("[data-step]"));
-  const header = document.querySelector<HTMLElement>(".header");
-  const deal = window.matchMedia("(min-width: 1101px) and (min-height: 700px)").matches;
+  const mobile = window.matchMedia("(max-width: 1100px)").matches;
+
+  section.classList.add("is-loading");
 
   const ctx = gsap.context(() => {
     // ---- heading
@@ -57,146 +48,75 @@ export function initProcess() {
         0.1,
       );
 
-    if (deal) dealDeck();
-    else steps.forEach(riseCard);
+    // ---- cards
+    if (mobile) {
+      steps.forEach((s) =>
+        ScrollTrigger.create({ trigger: s, start: "top 88%", animation: load(s), toggleActions: "play none none reverse" }),
+      );
+    } else {
+      const rows = new Map<number, HTMLElement[]>();
+      steps.forEach((s) => {
+        const top = Math.round(s.offsetTop);
+        rows.set(top, [...(rows.get(top) ?? []), s]);
+      });
+      rows.forEach((row) => {
+        const tl = gsap.timeline({ paused: true });
+        row.forEach((s, i) => tl.add(load(s), i * CARD_GAP));
+        ScrollTrigger.create({ trigger: row[0], start: "top 85%", animation: tl, toggleActions: "play none none reverse" });
+      });
+    }
   }, section);
 
-  /* ---------------- desktop: deal the deck ---------------- */
-  function dealDeck() {
-    section!.classList.add("is-dealing");
-    const n = steps.length;
-
-    // where each card has to travel to sit in the pile (layout offsets ignore transforms)
-    const pile = (i: number) => {
-      const el = steps[i];
-      const cx = el.offsetLeft + el.offsetWidth / 2;
-      const cy = el.offsetTop + el.offsetHeight / 2;
-      return {
-        x: grid.clientWidth / 2 - cx + PILE_X[i % PILE_X.length],
-        y: grid.clientHeight / 2 - cy + PILE_Y[i % PILE_Y.length],
-        scaleX: PILE_W / el.offsetWidth,
-        scaleY: PILE_H / el.offsetHeight,
-      };
-    };
-
-    const tl = gsap.timeline({ defaults: { ease: "none" } });
-
-    steps.forEach((el, i) => {
-      const back = el.querySelector<HTMLElement>("[data-back]");
-      const full = el.querySelector(".step__img--full");
-      const fine = el.querySelector(".step__img--fine");
-      const coarse = el.querySelector(".step__img--coarse");
-      const corners = el.querySelectorAll(".cta__corner");
-      const t = 0.2 + i * DEAL_GAP;
-
-      // face down in the pile; first card on top
-      gsap.set(el, { zIndex: 20 + n - i });
-      tl.fromTo(
-        el,
-        {
-          x: () => pile(i).x,
-          y: () => pile(i).y,
-          scaleX: () => pile(i).scaleX,
-          scaleY: () => pile(i).scaleY,
-          rotation: PILE_ROT[i % PILE_ROT.length],
-          rotationY: -180,
-        },
-        {
-          x: 0,
-          y: 0,
-          scaleX: 1,
-          scaleY: 1,
-          rotation: 0,
-          rotationY: 0,
-          duration: DEAL_LEN,
-          ease: "power3.inOut",
-          immediateRender: true,
-        },
-        t,
-      );
-      // lift off the pile: a quick pop towards the viewer, then settle
-      tl.fromTo(el, { z: 0 }, { z: 220, duration: DEAL_LEN * 0.45, ease: "power2.out", immediateRender: false }, t)
-        .to(el, { z: 0, duration: DEAL_LEN * 0.55, ease: "power2.in" }, t + DEAL_LEN * 0.45);
-      // shadow follows the lift
-      tl.fromTo(
-        el,
-        { boxShadow: "0 2px 6px rgba(0,0,0,.18)" },
-        { boxShadow: "0 40px 80px rgba(0,0,0,.22)", duration: DEAL_LEN * 0.45, ease: "power2.out", immediateRender: true },
-        t,
-      ).to(el, { boxShadow: "0 0 0 rgba(0,0,0,0)", duration: DEAL_LEN * 0.55, ease: "power2.in" }, t + DEAL_LEN * 0.45);
-      // flip: the back is visible until the card turns past 90°
-      if (back) {
-        tl.set(back, { opacity: 1 }, 0).set(back, { opacity: 0 }, t + DEAL_LEN * 0.5);
-      }
-      // illustration lands pixelated and resolves
-      if (full && fine && coarse) {
-        tl.set(full, { opacity: 0 }, 0)
-          .set(coarse, { opacity: 1 }, 0)
-          .set(fine, { opacity: 0 }, 0)
-          .set(coarse, { opacity: 0 }, t + DEAL_LEN * 0.75)
-          .set(fine, { opacity: 1 }, t + DEAL_LEN * 0.75)
-          .fromTo(full, { opacity: 0 }, { opacity: 1, duration: DEAL_LEN * 0.25, immediateRender: false }, t + DEAL_LEN * 0.92)
-          .set(fine, { opacity: 0 }, t + DEAL_LEN * 1.17);
-      }
-      // CTA corner squares snap on once the card has landed
-      if (corners.length) {
-        tl.fromTo(corners, { scale: 0 }, { scale: 1, duration: 0.25, stagger: 0.04, ease: "back.out(2)", immediateRender: true }, t + DEAL_LEN * 0.95);
-      }
-      // cards already dealt sit under the ones still flying
-      tl.set(el, { zIndex: 1 }, t + DEAL_LEN);
-    });
-    tl.to({}, { duration: 0.3 }); // short hold on the finished grid before the pin releases
-
-    const headerH = () => header?.offsetHeight ?? 0;
-    ScrollTrigger.create({
-      trigger: grid,
-      // centre the grid in the space under the sticky header
-      start: () => `center ${headerH() + (window.innerHeight - headerH()) / 2}px`,
-      end: () => `+=${window.innerHeight * 1.9}`,
-      pin: true,
-      scrub: 0.6,
-      animation: tl,
-      anticipatePin: 1,
-      invalidateOnRefresh: true,
-    });
-  }
-
-  /* ---------------- tablet / phone: rise into place ---------------- */
-  function riseCard(step: HTMLElement) {
+  function load(step: HTMLElement) {
+    const skel = step.querySelector("[data-skel]");
+    const bar = step.querySelector("[data-load]");
     const titles = step.querySelectorAll("[data-step-title]");
     const text = step.querySelectorAll("[data-step-text]");
     const full = step.querySelector(".step__img--full");
     const fine = step.querySelector(".step__img--fine");
     const coarse = step.querySelector(".step__img--coarse");
     const corners = step.querySelectorAll(".cta__corner");
+    const bg = step.querySelector(".cta__bg");
 
     const tl = gsap.timeline();
-    tl.fromTo(
-      step,
-      { y: 90, rotationX: 28, scale: 0.92, transformPerspective: 1200, transformOrigin: "50% 100%", opacity: 0, clipPath: "inset(0% 0% 100% 0%)" },
-      { y: 0, rotationX: 0, scale: 1, opacity: 1, clipPath: "inset(0% 0% 0% 0%)", duration: 0.9, ease: "power3.out", clearProps: "clipPath,transform" },
-    ).fromTo(
-      titles,
-      { opacity: 0, filter: "blur(6px)", y: 8 },
-      { opacity: 1, filter: "blur(0px)", y: 0, duration: 0.5, stagger: 0.05, ease: "power2.out" },
-      0.2,
-    );
+    // 1 · skeleton card appears
+    tl.fromTo(step, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 0)
+      .fromTo(skel, { opacity: 1 }, { opacity: 1, duration: 0.01 }, 0);
+    // 2 · progress line fills in uneven steps, like a real request
+    if (bar) {
+      tl.set(bar, { opacity: 1, scaleX: 0 }, 0.1)
+        .to(bar, { scaleX: 0.35, duration: 0.3, ease: "power2.out" }, 0.15)
+        .to(bar, { scaleX: 0.7, duration: 0.25, ease: "power1.inOut" }, 0.55)
+        .to(bar, { scaleX: 1, duration: 0.2, ease: "power1.in" }, 0.9)
+        .to(bar, { opacity: 0, duration: 0.25 }, 1.12);
+    }
+    // 3 · content replaces the skeleton
+    const at = 1.05;
     if (full && fine && coarse) {
       tl.set(full, { opacity: 0 }, 0)
-        .fromTo(coarse, { opacity: 0 }, { opacity: 1, duration: 0.15 }, 0.25)
-        .set(fine, { opacity: 1 }, 0.5)
-        .set(coarse, { opacity: 0 }, 0.5)
-        .to(full, { opacity: 1, duration: 0.3, ease: "power1.out" }, 0.7)
-        .set(fine, { opacity: 0 }, 1);
+        .set(fine, { opacity: 0 }, 0)
+        .set(coarse, { opacity: 0 }, 0)
+        .set(coarse, { opacity: 1 }, at)
+        .set(fine, { opacity: 1 }, at + 0.18)
+        .set(coarse, { opacity: 0 }, at + 0.18)
+        .to(full, { opacity: 1, duration: 0.3, ease: "power1.out" }, at + 0.36)
+        .set(fine, { opacity: 0 }, at + 0.66);
     }
-    if (corners.length) tl.fromTo(corners, { scale: 0 }, { scale: 1, duration: 0.35, stagger: 0.05, ease: "back.out(2)" }, 0.6);
-    tl.fromTo(text, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.6);
-
-    ScrollTrigger.create({ trigger: step, start: "top 88%", animation: tl, toggleActions: "play none none reverse" });
+    if (bg) tl.fromTo(bg, { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.6, ease: "power2.out" }, at);
+    tl.to(skel, { opacity: 0, duration: 0.35, ease: "power1.out" }, at)
+      .fromTo(
+        titles,
+        { opacity: 0, filter: "blur(6px)" },
+        { opacity: 1, filter: "blur(0px)", duration: 0.45, stagger: 0.05, ease: "power2.out" },
+        at + 0.05,
+      )
+      .fromTo(text, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, at + 0.3);
+    if (corners.length) tl.fromTo(corners, { scale: 0 }, { scale: 1, duration: 0.3, stagger: 0.04, ease: "back.out(2)" }, at + 0.3);
+    return tl;
   }
 
   return () => {
     ctx.revert();
-    section.classList.remove("is-dealing");
+    section.classList.remove("is-loading");
   };
 }
