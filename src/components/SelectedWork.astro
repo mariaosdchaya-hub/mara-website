@@ -89,11 +89,11 @@ const count = cases.length;
     color: #6b6b70;
   }
 
-  /* ---------- stack ---------- */
+  /* ---------- stack: filing-cabinet deck ---------- */
   .stack {
-    /* deck spans ~1.62 card heights (strips above + below), so width is also capped by viewport height */
     --ratio: calc(529 / 1002);
-    --card-w: min(1002px, 70vw, (100svh - var(--header-h, 64px) - 64px) * 1.17);
+    /* folders are narrower than the page so the row and the lifted card both fit */
+    --card-w: min(560px, 40vw, (100svh - var(--header-h, 64px)) * .85);
     position: relative;
     height: calc(100svh - var(--header-h, 64px));
     min-height: 620px;
@@ -106,21 +106,25 @@ const count = cases.length;
     margin: 0;
     padding: 0;
     list-style: none;
+    perspective: 1500px;
+    perspective-origin: 50% -25%; /* camera above the drawer */
+    /* flat stacking: cards keep DOM / z-index order, so nearer folders always overlap farther ones */
+    transform-origin: 50% 40%;
   }
   .card {
     position: absolute;
     left: 50%;
-    top: 50%;
+    top: 0;
     width: var(--card-w);
     aspect-ratio: 1002 / 529;
     margin-left: calc(var(--card-w) / -2);
-    /* open card sits a little above centre so the deeper strips below fit */
-    margin-top: calc(var(--card-w) * var(--ratio) * -0.61);
+    transform-origin: 50% 100%;
     backface-visibility: hidden;
-    /* soft contact shadow so each sheet reads as lying on the one behind */
-    box-shadow: 0 -6px 18px rgba(0, 0, 0, .14), 0 10px 24px rgba(0, 0, 0, .16);
-    will-change: transform, opacity;
+    will-change: transform;
+    box-shadow: 0 -4px 14px rgba(0, 0, 0, .12);
   }
+  .card__info, .card__tags { transition: opacity .3s ease; }
+  .work.is-3d .card:not(.is-lifted) .card__info { opacity: 0; }
   .card__link {
     position: absolute;
     inset: 0;
@@ -222,14 +226,14 @@ const count = cases.length;
   @media (max-width: 1100px) {
     .work { padding: 80px 32px 0; }
     .stack__meta { display: none; }
-    .stack { --card-w: min(1002px, 84vw, (100svh - var(--header-h, 64px) - 64px) * 1.17); }
+    .stack { --card-w: min(600px, 62vw, (100svh - var(--header-h, 64px)) * 1.02); }
   }
   @media (max-width: 768px) {
     .work { padding: 72px 16px 0; }
     .work__head { flex-direction: column; align-items: flex-start; gap: 16px; }
     .work__title { font-size: 36px; }
     .work__note { font-size: 14px; }
-    .stack { --ratio: 1.25; --card-w: min(100vw - 32px, (100svh - var(--header-h, 64px) - 48px) * .49); min-height: 520px; }
+    .stack { --ratio: 1.25; --card-w: min(78vw, (100svh - var(--header-h, 64px)) * .42); min-height: 520px; }
     .card { aspect-ratio: 4 / 5; }
     .card__info { padding: 20px; height: 55%; }
     .card__title { font-size: 24px; }
