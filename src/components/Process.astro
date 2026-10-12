@@ -1,0 +1,267 @@
+---
+import { Image, getImage } from "astro:assets";
+import scope from "../assets/process/scope.png";
+import flows from "../assets/process/flows.png";
+import wireframes from "../assets/process/wireframes.png";
+import ui from "../assets/process/ui.png";
+import prototype from "../assets/process/prototype.png";
+import launch from "../assets/process/launch.png";
+import cta from "../assets/process/cta.png";
+
+// art box: w/h = Figma size, top = Figma offset, dx = shift from the card centre, fit = object-fit
+const steps = [
+  { n: "01", title: "Scope", text: "We define your product’s core value and one essential job. Everything else waits, keeping scope creep out.", img: scope, w: 314, h: 249, top: 75, dx: 0, fit: "cover", row: 1, size: "fixed" },
+  { n: "02", title: "Flows", text: "The core user journeys mapped end to end, before a single screen is designed.", img: flows, w: 628, h: 499, top: -48, dx: 6, fit: "contain", row: 1, size: "wide" },
+  { n: "03", title: "Wireframes", text: "Low-fidelity structure for every key screen. Fast to change and align on.", img: wireframes, w: 323, h: 257, top: 80, dx: -5, fit: "cover", row: 1, size: "fixed" },
+  { n: "04", title: "UI Design", text: "The visual system applied. Components and states, ready to build.", img: ui, w: 376, h: 299, top: 44, dx: 4, fit: "cover", row: 2, size: "flex" },
+  { n: "05", title: "Prototype", text: "A clickable build to test the real flow before engineering starts.", img: prototype, w: 554, h: 441, top: 0, dx: -102, fit: "cover", row: 2, size: "flex" },
+  { n: "06", title: "Launch", text: "Design handed off and shipped, with support through release.", img: launch, w: 264, h: 209, top: 96, dx: 4, fit: "cover", row: 2, size: "flex" },
+];
+
+// tiny copies for the "de-pixelate" reveal (reference: LE:MA services cards)
+const pixels = await Promise.all(
+  steps.map(async (s) => ({
+    coarse: (await getImage({ src: s.img, width: 18, format: "png" })).src,
+    fine: (await getImage({ src: s.img, width: 48, format: "png" })).src,
+  })),
+);
+---
+<section class="process" id="process" data-process>
+  <div class="process__head">
+    <h2 class="process__title" data-split>
+      <span class="line"><span>Cut through the noise first,</span></span>
+      <span class="line"><span>then design what matters.</span></span>
+    </h2>
+    <p class="process__overline" data-fade>( MVP process )</p>
+  </div>
+
+  <ol class="process__grid" role="list">
+    {steps.map((s, i) => (
+      <li class={`step step--${s.size} step--row${s.row}`} data-step>
+        <div class="step__head">
+          <h3 class="step__title" data-step-title>{s.title}</h3>
+          <span class="step__num" data-step-title>{s.n}</span>
+        </div>
+        <div
+          class="step__art"
+          aria-hidden="true"
+          style={`--w:${s.w}px;--h:${s.h}px;--top:${s.top}px;--dx:${s.dx}px;--fit:${s.fit}`}
+          data-art
+        >
+          <Image src={s.img} alt="" widths={[s.w, s.w * 2]} sizes={`${s.w}px`} loading="lazy" class="step__img step__img--full" />
+          <img src={pixels[i].fine} alt="" class="step__img step__img--px step__img--fine" loading="lazy" />
+          <img src={pixels[i].coarse} alt="" class="step__img step__img--px step__img--coarse" loading="lazy" />
+        </div>
+        <p class="step__text" data-step-text>{s.text}</p>
+      </li>
+    ))}
+
+    <li class="step step--cta step--row2" data-step>
+      <div class="cta__bg" aria-hidden="true">
+        <Image src={cta} alt="" widths={[322, 644]} sizes="322px" loading="lazy" class="cta__img" />
+      </div>
+      <div class="cta__top">
+        <p class="cta__overline" data-step-title>( Let’s ship )</p>
+        <p class="cta__title" data-step-title>Have an idea?<br />Let’s build it.</p>
+      </div>
+      <a href="#contact" class="cta__btn" data-step-text>Start your MVP</a>
+      <span class="cta__corner cta__corner--tl" aria-hidden="true"></span>
+      <span class="cta__corner cta__corner--tr" aria-hidden="true"></span>
+      <span class="cta__corner cta__corner--bl" aria-hidden="true"></span>
+      <span class="cta__corner cta__corner--br" aria-hidden="true"></span>
+    </li>
+  </ol>
+</section>
+
+<style>
+  .process {
+    /* sits above the work deck so the leaving folders slide under it, like the reference */
+    position: relative;
+    z-index: 1;
+    background: #fff;
+    color: #0d221a;
+    padding: 88px 56px;
+  }
+  .process__head,
+  .process__grid { max-width: 1328px; margin: 0 auto; }
+
+  .process__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 32px;
+    margin-bottom: 48px;
+  }
+  .process__title {
+    margin: 0;
+    font-size: 48px;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .line { display: block; overflow: hidden; padding-bottom: .08em; margin-bottom: -.08em; }
+  .line > span { display: inline-block; }
+  .process__overline {
+    margin: 0;
+    color: #6b6b70;
+    font-size: 12px;
+    line-height: 1.35;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* row 1 = 322 · flex · 322, row 2 = flex · flex · flex · 322 (a zero-height flex item breaks the rows) */
+  .process__grid {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 24px;
+    padding: 0;
+    list-style: none;
+  }
+  .step {
+    position: relative;
+    height: 430px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    background: #f6f6f7;
+    border: 1px solid #e6e6e9;
+  }
+  .step--fixed, .step--cta { flex: 0 0 322px; }
+  .step--wide { flex: 1 1 0; min-width: 0; }
+  .step--flex { flex: 1 1 0; min-width: 0; }
+  .step--row1 { order: 1; }
+  .step--row2 { order: 3; margin-top: 24px; }
+  .process__grid::after { content: ""; order: 2; flex-basis: 100%; height: 0; }
+
+  .step__head {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .step__title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.005em;
+    color: #141414;
+  }
+  .step__num { font-size: 16px; line-height: 1.5; color: #9999a1; }
+  .step__text {
+    position: relative;
+    z-index: 2;
+    margin: 0;
+    max-width: 30em;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #6b6b70;
+  }
+
+  .step__art {
+    position: absolute;
+    top: var(--top);
+    left: 50%;
+    width: var(--w);
+    height: var(--h);
+    transform: translateX(calc(-50% + var(--dx)));
+    mix-blend-mode: multiply;
+    pointer-events: none;
+  }
+  .step__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: var(--fit);
+  }
+  .step__img--px { image-rendering: pixelated; opacity: 0; }
+
+  /* CTA card */
+  .step--cta {
+    overflow: visible;
+    padding: 32px;
+    background: #141414;
+    border: 0;
+    align-items: flex-start;
+  }
+  .cta__bg { position: absolute; inset: 0; overflow: hidden; }
+  .cta__img {
+    position: absolute;
+    left: -19.88%;
+    top: -43.04%;
+    width: 119.88%;
+    height: 159.61%;
+    max-width: none;
+  }
+  .cta__bg::after { content: ""; position: absolute; inset: 0; background: #79f2ff; mix-blend-mode: color; }
+  .cta__top { position: relative; display: flex; flex-direction: column; gap: 16px; }
+  .cta__overline {
+    margin: 0;
+    color: #79f2ff;
+    font-size: 13px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .cta__title { margin: 0; color: #fff; font-size: 30px; font-weight: 500; line-height: 1.1; }
+  .cta__btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 20px;
+    background: #79f2ff;
+    color: #141414;
+    font-size: 13.6px;
+    font-weight: 500;
+    line-height: 21px;
+    letter-spacing: .1px;
+    transition: background-color .2s;
+  }
+  .cta__btn:hover { background: #fff; }
+  .cta__corner {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #79f2ff;
+    border: 1.5px solid #141414;
+    z-index: 3;
+  }
+  .cta__corner--tl { left: -5px; top: -5px; }
+  .cta__corner--tr { right: -5px; top: -5px; }
+  .cta__corner--bl { left: -5px; bottom: -5px; }
+  .cta__corner--br { right: -5px; bottom: -5px; }
+
+  @media (max-width: 1100px) {
+    .process { padding: 80px 32px; }
+    .process__grid { row-gap: 24px; }
+    .process__grid::after { display: none; }
+    .step, .step--row1, .step--row2 { order: 0; margin-top: 0; }
+    .step--fixed, .step--cta, .step--flex { flex: 1 1 calc(50% - 12px); }
+    .step--wide { flex: 1 1 100%; }
+  }
+  @media (max-width: 768px) {
+    .process { padding: 72px 16px; }
+    .process__head { flex-direction: column-reverse; gap: 16px; margin-bottom: 32px; }
+    .process__title { font-size: 32px; letter-spacing: -0.02em; }
+    /* the two lines don't fit a phone: let them flow (the reveal falls back to blur + fade) */
+    .line, .line > span { display: inline; }
+    .line + .line::before { content: " "; }
+    .step--fixed, .step--cta, .step--flex, .step--wide { flex: 1 1 100%; }
+    .step { height: 400px; padding: 24px; }
+    .step__title { font-size: 22px; }
+    .step--wide .step__art { --w: 520px; --h: 413px; --top: -20px; }
+  }
+</style>
+
+<script>
+  import { initProcess } from "../scripts/process-motion";
+  const cleanup = initProcess();
+  document.addEventListener("astro:before-swap", () => cleanup?.(), { once: true });
+</script>

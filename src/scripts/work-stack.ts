@@ -140,8 +140,15 @@ export function initWorkStack() {
         if (hovered === null) go({ focus: scrollFocus, lift: canHover ? state.lift : 1 }, 0.35);
         else render();
       },
-      onLeave: () => !canHover && go({ lift: 0 }),
-      onLeaveBack: () => !canHover && go({ lift: 0 }),
+      // leaving the cabinet (either way) every folder drops back into the row, as in the reference
+      onLeave: () => {
+        hovered = null;
+        go({ lift: 0 }, 0.45);
+      },
+      onLeaveBack: () => {
+        hovered = null;
+        go({ lift: 0 }, 0.45);
+      },
     });
   }, section);
 
