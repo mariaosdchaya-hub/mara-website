@@ -16,7 +16,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const CARD_GAP = 0.14; // delay between neighbouring cards in a row
+const CARD_GAP = 0.08; // delay between neighbouring cards in a row
 
 export function initProcess() {
   const section = document.querySelector<HTMLElement>("[data-process]");
@@ -80,38 +80,38 @@ export function initProcess() {
 
     const tl = gsap.timeline();
     // 1 · skeleton card appears
-    tl.fromTo(step, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 0)
+    tl.fromTo(step, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 0)
       .fromTo(skel, { opacity: 1 }, { opacity: 1, duration: 0.01 }, 0);
     // 2 · progress line fills in uneven steps, like a real request
     if (bar) {
-      tl.set(bar, { opacity: 1, scaleX: 0 }, 0.1)
-        .to(bar, { scaleX: 0.35, duration: 0.3, ease: "power2.out" }, 0.15)
-        .to(bar, { scaleX: 0.7, duration: 0.25, ease: "power1.inOut" }, 0.55)
-        .to(bar, { scaleX: 1, duration: 0.2, ease: "power1.in" }, 0.9)
-        .to(bar, { opacity: 0, duration: 0.25 }, 1.12);
+      tl.set(bar, { opacity: 1, scaleX: 0 }, 0.04)
+        .to(bar, { scaleX: 0.35, duration: 0.15, ease: "power2.out" }, 0.06)
+        .to(bar, { scaleX: 0.7, duration: 0.12, ease: "power1.inOut" }, 0.24)
+        .to(bar, { scaleX: 1, duration: 0.1, ease: "power1.in" }, 0.38)
+        .to(bar, { opacity: 0, duration: 0.15 }, 0.5);
     }
     // 3 · content replaces the skeleton
-    const at = 1.05;
+    const at = 0.48;
     if (full && fine && coarse) {
       tl.set(full, { opacity: 0 }, 0)
         .set(fine, { opacity: 0 }, 0)
         .set(coarse, { opacity: 0 }, 0)
         .set(coarse, { opacity: 1 }, at)
-        .set(fine, { opacity: 1 }, at + 0.18)
-        .set(coarse, { opacity: 0 }, at + 0.18)
-        .to(full, { opacity: 1, duration: 0.3, ease: "power1.out" }, at + 0.36)
-        .set(fine, { opacity: 0 }, at + 0.66);
+        .set(fine, { opacity: 1 }, at + 0.1)
+        .set(coarse, { opacity: 0 }, at + 0.1)
+        .to(full, { opacity: 1, duration: 0.2, ease: "power1.out" }, at + 0.2)
+        .set(fine, { opacity: 0 }, at + 0.4);
     }
-    if (bg) tl.fromTo(bg, { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.6, ease: "power2.out" }, at);
-    tl.to(skel, { opacity: 0, duration: 0.35, ease: "power1.out" }, at)
+    if (bg) tl.fromTo(bg, { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.4, ease: "power2.out" }, at);
+    tl.to(skel, { opacity: 0, duration: 0.25, ease: "power1.out" }, at)
       .fromTo(
         titles,
         { opacity: 0, filter: "blur(6px)" },
-        { opacity: 1, filter: "blur(0px)", duration: 0.45, stagger: 0.05, ease: "power2.out" },
-        at + 0.05,
+        { opacity: 1, filter: "blur(0px)", duration: 0.3, stagger: 0.04, ease: "power2.out" },
+        at + 0.03,
       )
-      .fromTo(text, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, at + 0.3);
-    if (corners.length) tl.fromTo(corners, { scale: 0 }, { scale: 1, duration: 0.3, stagger: 0.04, ease: "back.out(2)" }, at + 0.3);
+      .fromTo(text, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, at + 0.15);
+    if (corners.length) tl.fromTo(corners, { scale: 0 }, { scale: 1, duration: 0.25, stagger: 0.03, ease: "back.out(2)" }, at + 0.15);
     return tl;
   }
 
