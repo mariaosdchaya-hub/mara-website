@@ -1,0 +1,187 @@
+---
+// "In their words" — founder quotes. Figma: section 4202:2747, copy 4258:2284, cursor tags 4258:2286.
+// The section pins while scrolling and steps through the quotes; two small tags follow the cursor.
+const quotes = [
+  { company: "ZofiQ", text: "We worked with Mara for a year and a half, up to our successful acquisition — highly professional and instrumental at every step.", name: "Lee Silverstone", role: "Founder, ZofiQ (acquired by ConnectWise)" },
+  { company: "SocialSelf", text: "They optimized our landing pages and helped us grow 3× within six months.", name: "Viktor Sander", role: "Co-Founder, SocialSelf" },
+  { company: "Delphyr", text: "They ask the right questions, challenge decisions, and help us build things that actually make sense.", name: "Michel Abdel Malek", role: "Founder, Delphyr" },
+  { company: "Findevor", text: "Working with Mara feels more like having them on our team than an external partner.", name: "Alex Valdes", role: "Co-Founder, Findevor" },
+  { company: "Minisport", text: "Mara led a strategic redesign across our entire business — branding, product and marketing.", name: "Matthew Paterson", role: "Founder, Minisport" },
+  { company: "Silo", text: "Delivered under tight deadlines and proactively suggests better solutions, so we never need to guide them.", name: "Niall Cullen", role: "CEO, Silo" },
+];
+const total = String(quotes.length).padStart(2, "0");
+---
+<section class="voices" id="voices" data-voices aria-label="In their words — what founders say">
+  <div class="voices__stage">
+    <ul class="voices__list" role="list">
+      {quotes.map((q, i) => (
+        <li class:list={["voice", { "is-active": i === 0 }]} data-voice aria-hidden={i === 0 ? undefined : "true"}>
+          <span class="voice__tag" data-part>{q.company}</span>
+          <blockquote class="voice__quote" data-part>“{q.text}”</blockquote>
+          <p class="voice__who" data-part>
+            <span class="voice__name">{q.name}</span>
+            <span>{q.role}</span>
+          </p>
+        </li>
+      ))}
+    </ul>
+
+    <div class="voices__frame" aria-hidden="true">
+      <div class="voices__row voices__row--meta">
+        <span class="voices__counter">( <span data-voice-index>01</span> / {total} )</span>
+        <span>In their words</span>
+        <span class="voices__right">Founders we’ve built with</span>
+      </div>
+      <div class="voices__row voices__row--mid">
+        <span class="voices__side">01 <span class="voices__line"><span class="voices__fill" data-voice-progress></span></span></span>
+        <span class="voices__side"><span class="voices__line"></span> {total}</span>
+      </div>
+      <div class="voices__row voices__row--meta">
+        <span>Pre-seed · Seed · Series A</span>
+        <span>{quotes.length} founders, {quotes.length} products</span>
+        <span class="voices__right voices__hint">Move your cursor ↗</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- cursor tags (moved to <body> by the script so they can follow the pointer anywhere in the section) -->
+  <div class="voices__cursor" aria-hidden="true" data-voice-cursor>
+    <span>In their</span><span>words</span>
+  </div>
+</section>
+
+<style>
+  .voices {
+    position: relative;
+    z-index: 1;
+    background: #fff;
+    color: #121214;
+  }
+  .voices__stage {
+    position: relative;
+    height: calc(100svh - var(--header-h, 64px));
+    min-height: 524px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 96px 56px;
+  }
+
+  /* all quotes share one grid cell, so the block keeps the height of the longest one */
+  .voices__list {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .voice {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    text-align: center;
+    visibility: hidden;
+  }
+  .voice.is-active { visibility: visible; }
+  .voice__tag {
+    padding: 4px 8px;
+    background: #79f2ff;
+    color: #141414;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .voice__quote {
+    margin: 0;
+    max-width: 560px;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.005em;
+    color: #000;
+    text-wrap: balance;
+  }
+  .voice__who {
+    display: flex;
+    flex-direction: column;
+    margin: 32px 0 0;
+    max-width: 344px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #a2a2a8;
+  }
+  .voice__name { color: #61646b; }
+
+  /* side labels */
+  .voices__frame {
+    position: absolute;
+    inset: 0;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+  .voices__row { display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+  .voices__row > * { flex: 1 1 0; }
+  .voices__row > :nth-child(2) { text-align: center; }
+  .voices__right { text-align: right; }
+  .voices__row--meta {
+    color: #73737a;
+    font-size: 12px;
+    line-height: 1.35;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .voices__row--mid { font-size: 14px; line-height: 1.45; color: #121214; }
+  .voices__row--mid > * { flex: 0 0 auto; }
+  .voices__side { display: inline-flex; align-items: center; gap: 12px; }
+  .voices__line { position: relative; width: 48px; height: 1px; background: rgba(115, 115, 122, .5); overflow: hidden; }
+  .voices__fill { position: absolute; inset: 0; background: #121214; transform: scaleX(calc(1 / 6)); transform-origin: 0 50%; }
+
+  /* cursor tags: the Figma tag scaled down to ~cursor height (≤ 28px) */
+  .voices__cursor {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 60;
+    display: flex;
+    gap: 3px;
+    pointer-events: none;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  .voices__cursor span {
+    padding: 4px 9px 6px;
+    background: #bdebee;
+    color: #0d221a;
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    .voices__hint, .voices__cursor { display: none; }
+  }
+  @media (max-width: 768px) {
+    .voices__stage { padding: 88px 16px; min-height: 560px; }
+    .voices__frame { padding: 20px 16px; }
+    .voices__row--meta > :nth-child(2) { display: none; }
+    .voices__row--mid { display: none; }
+    .voices__row--meta > * { white-space: nowrap; }
+    .voice__quote { font-size: 20px; }
+    .voice__who { font-size: 14px; margin-top: 24px; }
+  }
+</style>
+
+<script>
+  import { initVoices } from "../scripts/voices-motion";
+  const cleanup = initVoices();
+  document.addEventListener("astro:before-swap", () => cleanup?.(), { once: true });
+</script>
