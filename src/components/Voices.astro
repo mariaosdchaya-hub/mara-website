@@ -5,6 +5,8 @@ const quotes = [
   { company: "ZofiQ", text: "We worked with Mara for a year and a half, up to our successful acquisition — highly professional and instrumental at every step.", name: "Lee Silverstone", role: "Founder, ZofiQ (acquired by ConnectWise)" },
   { company: "SocialSelf", text: "They optimized our landing pages and helped us grow 3× within six months.", name: "Viktor Sander", role: "Co-Founder, SocialSelf" },
   { company: "Delphyr", text: "They ask the right questions, challenge decisions, and help us build things that actually make sense.", name: "Michel Abdel Malek", role: "Founder, Delphyr" },
+  { company: "Findevor", text: "Working with Mara feels more like having them on our team than an external partner.", name: "Alex Valdes", role: "Co-Founder, Findevor" },
+  { company: "Minisport", text: "Mara led a strategic redesign across our entire business — branding, product and marketing.", name: "Matthew Paterson", role: "Founder, Minisport" },
   { company: "Silo", text: "Delivered under tight deadlines and proactively suggests better solutions, so we never need to guide them.", name: "Niall Cullen", role: "CEO, Silo" },
 ];
 const total = String(quotes.length).padStart(2, "0");
@@ -24,21 +26,19 @@ const total = String(quotes.length).padStart(2, "0");
       ))}
     </ul>
 
-    <div class="voices__frame">
+    <div class="voices__frame" aria-hidden="true">
       <div class="voices__row voices__row--meta">
-        <span class="voices__counter" aria-hidden="true">( <span data-voice-index>01</span> / {total} )</span>
+        <span class="voices__counter">( <span data-voice-index>01</span> / {total} )</span>
         <span>In their words</span>
         <span class="voices__right">Founders we’ve built with</span>
       </div>
-      <div class="voices__row voices__row--mid" aria-hidden="true">
+      <div class="voices__row voices__row--mid">
         <span class="voices__side">01 <span class="voices__line"><span class="voices__fill" data-voice-progress></span></span></span>
         <span class="voices__side"><span class="voices__line"></span> {total}</span>
       </div>
       <div class="voices__row voices__row--meta">
         <span>Pre-seed · Seed · Series A</span>
-        <span class="voices__cta-wrap">
-          <a class="voices__cta" href="https://www.behance.net/mara-bureau" target="_blank" rel="noopener">View all projects <span aria-hidden="true">↗</span></a>
-        </span>
+        <span>{quotes.length} founders, {quotes.length} products</span>
         <span class="voices__right voices__hint">Move your cursor ↗</span>
       </div>
     </div>
@@ -131,25 +131,6 @@ const total = String(quotes.length).padStart(2, "0");
   .voices__row > * { flex: 1 1 0; }
   .voices__row > :nth-child(2) { text-align: center; }
   .voices__right { text-align: right; }
-  .voices__cta-wrap { text-align: center; }
-  .voices__cta {
-    pointer-events: auto;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    height: 36px;
-    padding: 0 16px;
-    background: #141414;
-    color: #fff;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-    transition: background-color .2s, color .2s;
-  }
-  .voices__cta:hover { background: #79f2ff; color: #141414; }
-  .voices__cta span { transition: transform .25s cubic-bezier(.2, .7, .2, 1); }
-  .voices__cta:hover span { transform: translate(2px, -2px); }
   .voices__row--meta {
     color: #73737a;
     font-size: 12px;
@@ -161,7 +142,7 @@ const total = String(quotes.length).padStart(2, "0");
   .voices__row--mid > * { flex: 0 0 auto; }
   .voices__side { display: inline-flex; align-items: center; gap: 12px; }
   .voices__line { position: relative; width: 48px; height: 1px; background: rgba(115, 115, 122, .5); overflow: hidden; }
-  .voices__fill { position: absolute; inset: 0; background: #121214; transform: scaleX(var(--fill0, .25)); transform-origin: 0 50%; }
+  .voices__fill { position: absolute; inset: 0; background: #121214; transform: scaleX(calc(1 / 6)); transform-origin: 0 50%; }
 
   /* cursor tags: the Figma tag scaled down to ~cursor height (≤ 28px) */
   .voices__cursor {
@@ -193,7 +174,7 @@ const total = String(quotes.length).padStart(2, "0");
   @media (max-width: 768px) {
     .voices__stage { padding: 88px 16px; min-height: 560px; }
     .voices__frame { padding: 20px 16px; }
-    .voices__row--meta:first-child > :nth-child(2), .voices__row--meta:last-child > :first-child { display: none; }
+    .voices__row--meta > :nth-child(2) { display: none; }
     .voices__row--mid { display: none; }
     .voices__row--meta > * { white-space: nowrap; }
     .voice__quote { font-size: 20px; }
