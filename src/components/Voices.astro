@@ -150,13 +150,15 @@ const total = String(quotes.length).padStart(2, "0");
     left: 0;
     top: 0;
     z-index: 60;
-    display: flex;
-    gap: 3px;
     pointer-events: none;
+  }
+  /* each tag trails the pointer on its own and is hidden until the pointer moves */
+  .voices__cursor span {
+    position: absolute;
+    left: 0;
+    top: 0;
     opacity: 0;
     will-change: transform, opacity;
-  }
-  .voices__cursor span {
     padding: 4px 9px 6px;
     background: #bdebee;
     color: #0d221a;

@@ -80,38 +80,55 @@ export function initVoices() {
     });
   }, section);
 
-  // cursor tags
+  // cursor tags: hidden by default; moving the pointer brings them in one after the other,
+  // the second trailing a little behind the first; when the pointer rests they leave in reverse
   if (cursor && fine && !reduce) {
     document.body.appendChild(cursor);
+    const tags = Array.from(cursor.querySelectorAll<HTMLElement>("span"));
     const OFFSET_X = 18;
     const OFFSET_Y = 14;
-    const xTo = gsap.quickTo(cursor, "x", { duration: 0.35, ease: "power3.out" });
-    const yTo = gsap.quickTo(cursor, "y", { duration: 0.35, ease: "power3.out" });
-    let inside = false;
+    const GAP = 3;
+    const IDLE = 700; // ms without movement before the tags hide
+    const followers = tags.map((tag, i) => ({
+      x: gsap.quickTo(tag, "x", { duration: 0.3 + i * 0.12, ease: "power3.out" }),
+      y: gsap.quickTo(tag, "y", { duration: 0.3 + i * 0.12, ease: "power3.out" }),
+    }));
+    gsap.set(tags, { scale: 0.6, transformOrigin: "0% 50%" });
+    let shown = false;
+    let idle = 0;
 
-    const move = (e: PointerEvent) => {
-      if (!inside) {
-        gsap.set(cursor, { x: e.clientX + OFFSET_X, y: e.clientY + OFFSET_Y });
-      }
-      xTo(e.clientX + OFFSET_X);
-      yTo(e.clientY + OFFSET_Y);
+    const target = (i: number, e: PointerEvent) => {
+      const dx = tags.slice(0, i).reduce((sum, t) => sum + t.offsetWidth + GAP, 0);
+      return { x: e.clientX + OFFSET_X + dx, y: e.clientY + OFFSET_Y };
     };
-    const enter = (e: PointerEvent) => {
-      move(e);
-      inside = true;
-      gsap.to(cursor, { opacity: 1, scale: 1, duration: 0.25, ease: "power2.out" });
+    const showTags = () => {
+      shown = true;
+      gsap.to(tags, { opacity: 1, scale: 1, duration: 0.28, stagger: 0.12, ease: "back.out(1.6)", overwrite: "auto" });
+    };
+    const hideTags = () => {
+      shown = false;
+      gsap.to([...tags].reverse(), { opacity: 0, scale: 0.6, duration: 0.2, stagger: 0.08, ease: "power2.in", overwrite: "auto" });
+    };
+    const move = (e: PointerEvent) => {
+      tags.forEach((tag, i) => {
+        const t = target(i, e);
+        if (!shown && Number(gsap.getProperty(tag, "opacity")) < 0.05) gsap.set(tag, t); // start at the pointer, no fly-in
+        followers[i].x(t.x);
+        followers[i].y(t.y);
+      });
+      if (!shown) showTags();
+      clearTimeout(idle);
+      idle = window.setTimeout(hideTags, IDLE);
     };
     const leave = () => {
-      inside = false;
-      gsap.to(cursor, { opacity: 0, scale: 0.85, duration: 0.2, ease: "power2.in" });
+      clearTimeout(idle);
+      hideTags();
     };
-    gsap.set(cursor, { scale: 0.85, transformOrigin: "0 0" });
     stage.addEventListener("pointermove", move);
-    stage.addEventListener("pointerenter", enter);
     stage.addEventListener("pointerleave", leave);
     cleanups.push(() => {
+      clearTimeout(idle);
       stage.removeEventListener("pointermove", move);
-      stage.removeEventListener("pointerenter", enter);
       stage.removeEventListener("pointerleave", leave);
       section.appendChild(cursor);
     });
