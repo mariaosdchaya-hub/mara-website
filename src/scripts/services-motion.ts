@@ -1,7 +1,7 @@
 /**
  * "What we do" — the section pins and vertical scroll drives the card row sideways,
- * left to right: it starts shifted left (the last cards in view) and travels right
- * until it settles in the Figma layout, first card at the left margin.
+ * right to left: it starts in the Figma layout (first card at the left margin) and
+ * travels left until the last card reaches the right margin.
  */
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -23,9 +23,9 @@ export function initServices() {
   const ctx = gsap.context(() => {
     gsap.fromTo(
       row,
-      { x: () => -travel() },
+      { x: 0 },
       {
-        x: 0,
+        x: () => -travel(),
         ease: "none",
         scrollTrigger: {
           trigger: section,
