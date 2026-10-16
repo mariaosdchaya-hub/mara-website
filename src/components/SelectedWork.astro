@@ -4,7 +4,8 @@ import { Image } from "astro:assets";
 
 const cases = (await getCollection("cases", ({ data }) => !data.draft && data.featured)).sort(
   (a, b) => a.data.order - b.data.order,
-);
+).slice(0, 4); // the homepage shows 4; the rest live behind "View all projects"
+const allProjects = "https://www.behance.net/mara-bureau";
 const count = cases.length;
 ---
 <section class="work" id="work" data-work>
@@ -19,9 +20,11 @@ const count = cases.length;
       <span class="stack__name" data-stack-name>{cases[0]?.data.title}</span>
     </div>
     <div class="stack__meta stack__meta--right" aria-hidden="true">
-      <span class="stack__label"><span data-stack-index>01</span> / {String(count).padStart(2, "0")}</span>
-      <span class="stack__name">{count} projects</span>
+      <span class="stack__label">Case</span>
+      <span class="stack__name" data-stack-index>01</span>
     </div>
+
+    <a class="btn-ghost stack__all" href={allProjects} target="_blank" rel="noopener">View all projects <span aria-hidden="true">↗</span></a>
 
     <ul class="stack__stage" role="list">
       {cases.map((c, i) => (
@@ -54,6 +57,9 @@ const count = cases.length;
         </li>
       ))}
     </ul>
+  </div>
+  <div class="work__all">
+    <a class="btn-ghost" href={allProjects} target="_blank" rel="noopener">View all projects <span aria-hidden="true">↗</span></a>
   </div>
 </section>
 
@@ -215,6 +221,27 @@ const count = cases.length;
   }
   .stack__meta--left { left: 0; }
   .stack__meta--right { right: 0; text-align: right; }
+
+  /* "View all projects" — ghost button; in the pinned frame on desktop, under the deck on smaller screens */
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 40px;
+    padding: 0 18px;
+    border: 1px solid #c9cbcf;
+    border-radius: 4px;
+    color: #0d221a;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: border-color .2s, background-color .2s;
+  }
+  .btn-ghost:hover { border-color: #0d221a; background: rgba(13, 34, 26, .03); }
+  .btn-ghost span { transition: transform .25s cubic-bezier(.2, .7, .2, 1); }
+  .btn-ghost:hover span { transform: translate(2px, -2px); }
+  .stack__all { position: absolute; right: 0; bottom: 32px; z-index: 200; background: #fff; }
+  .work__all { display: none; justify-content: center; padding: 40px 0 0; }
   .stack__label { color: #6b6b70; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
   .stack__name { color: #0d221a; }
 
@@ -222,11 +249,13 @@ const count = cases.length;
   .work:not(.is-3d) .stack { height: auto; min-height: 0; padding: 64px 0 120px; }
   .work:not(.is-3d) .stack__stage { position: static; display: grid; gap: 24px; perspective: none; }
   .work:not(.is-3d) .card { position: relative; left: auto; top: auto; margin: 0 auto; width: min(1002px, 100%); }
-  .work:not(.is-3d) .stack__meta { display: none; }
+  .work:not(.is-3d) .stack__meta, .work:not(.is-3d) .stack__all { display: none; }
+  .work:not(.is-3d) .work__all { display: flex; }
 
   @media (max-width: 1100px) {
     .work { padding: 80px 32px 0; }
-    .stack__meta { display: none; }
+    .stack__meta, .stack__all { display: none; }
+    .work__all { display: flex; }
     .stack { --card-w: min(680px, 70vw, (100svh - var(--header-h, 64px)) * 1.1); }
   }
   @media (max-width: 768px) {

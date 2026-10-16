@@ -6,5 +6,5 @@ cover: ../../assets/cases/delphyr.png
 coverAlt: "Trusty product shown on a tablet"
 link: "#"
 order: 5
-featured: true
+featured: false
 ---

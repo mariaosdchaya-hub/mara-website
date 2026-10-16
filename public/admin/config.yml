@@ -52,5 +52,5 @@ collections:
         value_type: int
         default: 100
         hint: "1 = first card. Lower numbers come first."
-      - { name: featured, label: Show in Selected work, widget: boolean, default: true }
+      - { name: featured, label: Show in Selected work, widget: boolean, default: true, hint: "The homepage shows the first 4 featured cases by position." }
       - { name: draft, label: Draft (hidden from site), widget: boolean, default: false }
