@@ -5,7 +5,7 @@
  *     when it lands, the grey dot in the corner lights up teal.
  *  3. The globe is scrubbed with scroll: it rises and grows into place while a soft circle
  *     opens from the middle of the map, so Europe shows first and the edges follow.
- *  4. The dark "We are worldwide" card slides up over the globe; countries appear
+ *  4. The dark "We are worldwide" card slides up over the globe; the regions appear
  *     column by column.
  */
 import { gsap } from "gsap";
