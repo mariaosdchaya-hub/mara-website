@@ -86,28 +86,37 @@ const regions = [
   .stat {
     flex: 1 1 0;
     min-width: 0;
-    height: 136px;
-    padding: 20px 22px;
+    height: 112px;
+    padding: 18px 20px 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     background: #f6f6f7;
   }
-  .stat__top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-  .stat__label { color: #6b6b70; font-size: 13px; letter-spacing: .02em; text-transform: uppercase; }
+  .stat__top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .stat__label {
+    overflow: hidden;
+    color: #6b6b70;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
   .stat__dot {
     flex: none;
-    width: 20px;
-    height: 20px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    background: #ededef;
-    border: 1px solid #e6e6e9;
-    transition: background-color .4s ease, border-color .4s ease, box-shadow .6s ease;
+    background: #d9d9de;
+    transition: background-color .4s ease, box-shadow .6s ease;
   }
-  .stat.is-done .stat__dot { background: #79f2ff; border-color: #79f2ff; box-shadow: 0 0 0 6px rgba(121, 242, 255, .25); }
-  .stat__value { display: flex; align-items: flex-start; gap: 2px; color: #141414; font-weight: 500; white-space: nowrap; }
-  .stat__num { font-size: 48px; line-height: 1; font-variant-numeric: tabular-nums; }
-  .stat__suffix { font-size: 24px; }
+  .stat.is-done .stat__dot { background: #2fd6e6; box-shadow: 0 0 0 4px rgba(121, 242, 255, .35); }
+  .stat__value { display: flex; align-items: flex-start; gap: 3px; color: #141414; white-space: nowrap; }
+  .stat__num { font-size: 40px; font-weight: 400; line-height: .9; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .stat__suffix { margin-top: 1px; font-size: 16px; font-weight: 400; line-height: 1; color: #6b6b70; }
 
   /* globe: fills the gap between the stats and the dark card and runs under the card.
      Its width follows the gap height so the same part of the map shows (Figma: 499 of 934 px above the card) */
@@ -156,6 +165,13 @@ const regions = [
   .world__region { margin: 0; color: #f6f6f7; font-size: 22px; line-height: 1.25; }
   .world__list { margin: 0; color: #8e8e95; font-size: 14px; line-height: 1.45; max-width: 26em; }
 
+  @media (max-width: 1360px) {
+    .results__title { font-size: 48px; }
+    .results__head { gap: 40px; }
+    .stats { gap: 12px; }
+    .stat { padding: 16px 16px 18px; }
+    .stat__label { letter-spacing: .03em; }
+  }
   @media (max-width: 1100px) {
     /* stacked layout scrolls normally */
     .results { height: auto; min-height: 0; padding: 80px 32px; gap: 32px; }
@@ -168,12 +184,11 @@ const regions = [
     .results { padding: 72px 16px; gap: 32px; }
     .results__title { font-size: 40px; }
     .stats { gap: 12px; }
-    .stat { flex-basis: calc(50% - 6px); height: 130px; padding: 16px; }
+    .stat { flex-basis: calc(50% - 6px); height: 100px; padding: 14px 14px 16px; }
     .globe { height: 220px; }
-    .stat__label { font-size: 11px; }
-    .stat__dot { width: 14px; height: 14px; }
-    .stat__num { font-size: 36px; }
-    .stat__suffix { font-size: 18px; }
+    .stat__label { font-size: 10px; letter-spacing: .05em; }
+    .stat__num { font-size: 32px; }
+    .stat__suffix { font-size: 14px; }
     .world { padding: 24px; gap: 20px; }
     .world__title { font-size: 26px; }
     .world__cols { flex-wrap: wrap; gap: 12px 16px; }
