@@ -1,146 +1,225 @@
 ---
-// "What we do" — Figma 4202:2753. Image tiles are pre-composited at 2x from the Figma layers
-// (inverted stripe render + teal colour blend); see src/assets/services.
-import { Image } from "astro:assets";
-import s1 from "../assets/services/s1.jpg";
-import s2 from "../assets/services/s2.jpg";
-import s3 from "../assets/services/s3.jpg";
-import s4 from "../assets/services/s4.jpg";
-import s5 from "../assets/services/s5.jpg";
-
-type Tile =
-  | { kind: "image"; img: ImageMetadata }
-  | { kind: "text"; title: string; label: string; tone: "dark" | "ink" | "light" | "teal"; h: number };
-
-const tiles: Tile[] = [
-  { kind: "image", img: s1 },
-  { kind: "text", title: "Your brand should connect before you explain.", label: "Brand Identity", tone: "ink", h: 366 },
-  { kind: "image", img: s2 },
-  { kind: "text", title: "Explain what you do in seconds. Turn visitors into customers.", label: "Website & Dev", tone: "light", h: 366 },
-  { kind: "image", img: s3 },
-  { kind: "text", title: "From first concept to launch-ready. Complexity made simple.", label: "MVP & Product", tone: "teal", h: 371 },
-  { kind: "image", img: s4 },
-  { kind: "text", title: "Native iOS and Android, from wireframe to App Store.", label: "Mobile App", tone: "dark", h: 420 },
-  { kind: "image", img: s5 },
+// "What we do" — tabs (layout from Figma 4269:2308 "Cut first" tabs card), one tab per capability.
+const icon = {
+  brand: `<path d="M24 13.5l2.6 7.9 7.9 2.6-7.9 2.6-2.6 7.9-2.6-7.9-7.9-2.6 7.9-2.6z" stroke="#fff" stroke-width="1.95" stroke-linejoin="round"/>`,
+  web: `<rect x="13.5" y="15.5" width="21" height="17" stroke="#fff" stroke-width="1.95"/><path d="M13.5 20.5h21" stroke="#fff" stroke-width="1.95"/><rect x="16" y="17.4" width="1.6" height="1.6" fill="#fff"/><rect x="19" y="17.4" width="1.6" height="1.6" fill="#fff"/>`,
+  mvp: `<path d="M24 13.5l10 5.5-10 5.5-10-5.5z" stroke="#fff" stroke-width="1.95" stroke-linejoin="round"/><path d="M14 24l10 5.5 10-5.5M14 29l10 5.5 10-5.5" stroke="#fff" stroke-width="1.95" stroke-linejoin="round"/>`,
+  mobile: `<rect x="17.5" y="12.5" width="13" height="23" rx="2" stroke="#fff" stroke-width="1.95"/><rect x="22" y="31" width="4" height="1.9" fill="#fff"/>`,
+};
+const services = [
+  {
+    tab: "Brand Identity",
+    icon: icon.brand,
+    title: "Your brand should connect before you explain.",
+    text: "We build an identity that makes a young company look established: positioning, a visual language and a voice that work everywhere, from the pitch deck to the product UI. Strategy comes first, so every asset has a reason to exist.",
+    outputs: ["Positioning and naming direction", "Logo and visual identity system", "Brand guidelines and templates", "Pitch deck and launch assets"],
+  },
+  {
+    tab: "Website & Dev",
+    icon: icon.web,
+    title: "Explain what you do in seconds. Turn visitors into customers.",
+    text: "Conversion-focused marketing sites, designed and built by the same team. Clear messaging, fast pages and a CMS your team can update without waiting on us.",
+    outputs: ["Messaging and page structure", "Responsive website design", "Build in Framer, Webflow or code", "CMS, analytics and SEO setup"],
+  },
+  {
+    tab: "MVP & Product",
+    icon: icon.mvp,
+    title: "From first concept to launch-ready. Complexity made simple.",
+    text: "We cut the idea down to the one job it has to do, then design and prototype the product around it. Lean scope, real flows and a hand-off engineers can build from on day one.",
+    outputs: ["Scope and core user flows", "Clickable prototype", "Product UI and design system", "Dev-ready hand-off and QA"],
+  },
+  {
+    tab: "Mobile App",
+    icon: icon.mobile,
+    title: "Native iOS and Android, from wireframe to App Store.",
+    text: "Mobile products designed for the platform, not squeezed into it. We follow iOS and Android conventions, design every state and prepare the store listing as well.",
+    outputs: ["iOS and Android UI", "Interactive prototype for testing", "Component library and states", "App Store and Google Play assets"],
+  },
 ];
 ---
 <section class="services" id="services" data-services>
   <div class="services__inner">
     <div class="services__head">
-      <h2 class="services__title">What<br />we do</h2>
-      <p class="services__note">Four capabilities, one roof<br />from identity to a shipped product.</p>
+      <h2 class="services__title" data-split>
+        <span class="line"><span>What</span></span>
+        <span class="line"><span>we do</span></span>
+      </h2>
+      <p class="services__note" data-fade>Four capabilities, one roof, from identity to a shipped product.</p>
     </div>
 
-    <div class="services__viewport">
-      <ul class="services__row" role="list" data-services-row>
-        {tiles.map((t) =>
-          t.kind === "image" ? (
-            <li class="tile tile--image" aria-hidden="true">
-              <Image src={t.img} alt="" widths={[300, 600]} sizes="300px" loading="lazy" />
-            </li>
-          ) : (
-            <li class={`tile tile--text tile--${t.tone}`} style={`--h:${t.h}px`}>
-              <a href="#contact" class="tile__link">
-                <p class="tile__title">{t.title}</p>
-                <span class="tile__foot">
-                  <span class="tile__label">{t.label}</span>
-                  <span class="tile__arrow" aria-hidden="true">↗</span>
-                </span>
-              </a>
-            </li>
-          ),
-        )}
-      </ul>
+    <div class="tabs-card" data-tabs-card>
+      <div class="tabs" role="tablist" aria-label="Services">
+        {services.map((s, i) => (
+          <button
+            type="button"
+            class:list={["tab", { "is-active": i === 0 }]}
+            role="tab"
+            id={`svc-tab-${i}`}
+            aria-controls={`svc-panel-${i}`}
+            aria-selected={i === 0 ? "true" : "false"}
+            tabindex={i === 0 ? 0 : -1}
+            data-tab
+          >
+            <span class="tab__bar" aria-hidden="true"></span>
+            <span class="tab__label"><span class="tab__num">{String(i + 1).padStart(2, "0")}</span>{s.tab}</span>
+          </button>
+        ))}
+      </div>
+
+      <div class="panels">
+        {services.map((s, i) => (
+          <div
+            class:list={["panel", { "is-active": i === 0 }]}
+            role="tabpanel"
+            id={`svc-panel-${i}`}
+            aria-labelledby={`svc-tab-${i}`}
+            inert={i !== 0}
+            data-panel
+          >
+            <div class="panel__left">
+              <svg class="panel__icon" width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true" data-anim>
+                <rect width="48" height="48" fill="#0D221A" />
+                <Fragment set:html={s.icon} />
+              </svg>
+              <h3 class="panel__title" data-anim>{s.title}</h3>
+              <span class="panel__rule" aria-hidden="true"></span>
+              <p class="panel__text" data-anim>{s.text}</p>
+            </div>
+            <div class="panel__right">
+              <p class="panel__label" data-anim>Typical outputs:</p>
+              <ul class="outputs" role="list">
+                {s.outputs.map((o) => (
+                  <li class="output" data-anim>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M15.333 4a.667.667 0 0 1 .667.667V12a.667.667 0 0 1-1.333 0V6.276l-8.862 8.863a.667.667 0 0 1-.943-.944l8.861-8.862H8a.667.667 0 0 1 0-1.333h7.333Z" fill="#9E9EA8"/></svg>
+                    {o}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   </div>
 </section>
 
 <style>
-  .services {
-    position: relative;
-    z-index: 1;
-    background: #fff;
-    color: #0d221a;
-    overflow: hidden;
-  }
+  .services { position: relative; z-index: 1; background: #f6f6f7; color: #0d221a; }
   .services__inner {
-    min-height: calc(100svh - var(--header-h, 64px));
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 88px 40px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 56px;
-    padding: 96px 0;
+    gap: 44px;
   }
-  .services__head {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 32px;
-    padding: 0 96px 0 56px;
-  }
-  .services__title {
-    margin: 0;
-    font-size: 48px;
-    font-weight: 400;
-    line-height: 1;
-    letter-spacing: -0.02em;
-  }
+  .services__head { display: flex; justify-content: space-between; align-items: center; gap: 32px; }
+  .services__title { margin: 0; font-size: 48px; font-weight: 400; line-height: 1; }
+  .services__title .line + .line { margin-top: 8px; }
+  .line { display: block; overflow: hidden; padding-bottom: .08em; margin-bottom: -.08em; }
+  .line > span { display: inline-block; }
   .services__note {
     margin: 0;
-    color: #6b6b70;
-    font-size: 18px;
-    line-height: 1.5;
-    letter-spacing: .02em;
+    padding: 0 29px;
+    width: 578px;
+    max-width: 100%;
+    font-size: 20px;
+    line-height: 22.5px;
     text-transform: uppercase;
   }
 
-  .services__viewport { padding: 0 56px; }
-  .services__row {
-    display: flex;
-    align-items: flex-start;
-    gap: 24px;
-    width: max-content;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    will-change: transform;
-  }
-  .tile { flex: none; width: 300px; overflow: hidden; }
-  .tile--image { height: 319px; }
-  .tile--image img { display: block; width: 100%; height: 100%; object-fit: cover; }
-
-  .tile--text { height: var(--h); }
-  .tile__link {
+  .tabs-card { background: #fff; border: 1px solid #e6e6e9; overflow: hidden; }
+  .tabs { display: flex; background: #f2f2f4; }
+  .tab {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-    padding: 28px;
+    padding: 0;
+    border: 0;
+    background: #f2f2f4;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color .3s ease;
   }
-  .tile__title { margin: 0; font-size: 24px; font-weight: 500; line-height: 1.25; letter-spacing: -0.005em; }
-  .tile__foot { display: flex; justify-content: space-between; align-items: center; }
-  .tile__label { opacity: .6; font-size: 12px; line-height: 1.35; letter-spacing: .04em; text-transform: uppercase; }
-  .tile__arrow { font-size: 20px; line-height: 1.3; transition: transform .25s cubic-bezier(.2, .7, .2, 1); }
-  .tile__link:hover .tile__arrow { transform: translate(3px, -3px); }
-  .tile--ink { background: #141416; color: #f0f0f2; }
-  .tile--light { background: #f0f0f2; color: #141414; }
-  .tile--teal { background: #bdebee; color: #141414; }
-  .tile--dark { background: #141414; color: #fff; }
+  .tab__bar { display: block; height: 3px; background: #79f2ff; transform: scaleX(0); transform-origin: 0 50%; transition: transform .45s cubic-bezier(.2, .7, .2, 1); }
+  .tab__label {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 26px 32px;
+    font-size: 20px;
+    font-weight: 500;
+    color: #6b6b70;
+    white-space: nowrap;
+    transition: color .3s ease;
+  }
+  .tab__num { font-weight: 400; color: #9999a1; transition: color .3s ease; }
+  .tab:hover .tab__label { color: #141414; }
+  .tab.is-active { background: #fff; }
+  .tab.is-active .tab__bar { transform: scaleX(1); }
+  .tab.is-active .tab__label, .tab.is-active .tab__num { color: #141414; }
+  .tab:focus-visible { outline: 2px solid #0d221a; outline-offset: -2px; }
 
-  @media (max-width: 768px) {
-    .services__inner { gap: 40px; padding: 72px 0; }
-    .services__head { flex-direction: column; gap: 16px; padding: 0 16px; }
-    .services__title { font-size: 36px; }
-    .services__note { font-size: 14px; }
-    .services__viewport { padding: 0 16px; }
-    .tile { width: 260px; }
-    .tile--image { height: 276px; }
-    .tile--text { height: calc(var(--h) * .87); }
-    .tile__link { padding: 22px; }
-    .tile__title { font-size: 21px; }
+  .panels { display: grid; }
+  .panel { grid-area: 1 / 1; display: flex; background: #fff; }
+  /* all panels share one cell so the card keeps the height of the tallest one */
+  .panel:not(.is-active) { visibility: hidden; }
+  .panel__left {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 26px;
+    padding: 48px 48px 56px;
+    border-right: 1px solid #e6e6e9;
   }
-  /* no JS / reduced motion: the row simply scrolls sideways */
-  .services:not(.is-scrolling) .services__viewport { overflow-x: auto; scrollbar-width: none; }
+  .panel__icon { display: block; }
+  .panel__title { margin: 0; font-size: 20px; font-weight: 500; line-height: 1.3; color: #141414; }
+  .panel__rule { align-self: stretch; height: 1px; background: #e6e6e9; }
+  .panel__text { margin: 0; max-width: 640px; font-size: 16px; line-height: 1.45; color: #6b6b70; }
+  .panel__right { flex: 0 0 470px; padding: 48px; }
+  .panel__label { margin: 0; font-size: 16px; line-height: 1.2; color: #6b6b70; }
+  .outputs { margin: 0; padding: 0; list-style: none; }
+  .output {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 24px 0;
+    font-size: 20px;
+    font-weight: 500;
+    color: #141414;
+  }
+  .output:first-child { padding-top: 28px; }
+  .output + .output { border-top: 1px solid #e6e6e9; }
+  .output svg { flex: none; }
+
+  @media (max-width: 1100px) {
+    .services__inner { padding: 80px 32px; }
+    .services__head { flex-direction: column; align-items: flex-start; }
+    .services__note { padding: 0; }
+    .tab__label { padding: 22px 20px; font-size: 17px; }
+    .panel__right { flex-basis: 380px; padding: 40px 32px; }
+    .panel__left { padding: 40px 32px 48px; }
+    .output { font-size: 18px; }
+  }
+  @media (max-width: 768px) {
+    .services__inner { padding: 72px 16px; gap: 32px; }
+    .services__title { font-size: 36px; }
+    .services__note { font-size: 15px; line-height: 1.4; }
+    .tabs { overflow-x: auto; scrollbar-width: none; scroll-snap-type: x mandatory; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { flex: 0 0 auto; scroll-snap-align: start; }
+    .tab__label { padding: 18px 18px; font-size: 15px; }
+    .panel { flex-direction: column; }
+    .panel__left { padding: 28px 20px 32px; gap: 20px; border-right: 0; border-bottom: 1px solid #e6e6e9; }
+    .panel__right { flex-basis: auto; padding: 28px 20px; }
+    .output { font-size: 16px; padding: 18px 0; }
+    .output:first-child { padding-top: 20px; }
+  }
 </style>
 
 <script>
