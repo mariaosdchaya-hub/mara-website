@@ -10,6 +10,7 @@ const stories = [
     company: "ZofiQ",
     logo: null,
     photo: "1737780663382.jpeg",
+    crop: true, // the source has an "Adobe Firefly" mark in the bottom-left corner: crop it out
     text: "We worked with Mara for a year and a half, up to our successful acquisition. We’re very happy with the team — highly professional and instrumental in helping us overcome every challenge along the way.",
     metric: { prefix: "", value: 18, suffix: "mo", caption: "of partnership, up to the acquisition." }, // placeholder
   },
@@ -36,17 +37,20 @@ const stories = [
 <section class="testi" id="testimonials" data-testi>
   <div class="testi__inner">
     <div class="testi__head">
-      <p class="sec-label" data-fade>( Hear it from our clients )</p>
-      <h2 class="testi__title" data-split>
-        <span class="line"><span>Trusted by 100+ companies</span></span>
-        <span class="line"><span>to design, build and raise.</span></span>
-      </h2>
+      <div>
+        <p class="sec-label" data-fade>( Hear it from our clients )</p>
+        <h2 class="testi__title" data-split>
+          <span class="line"><span>Trusted by 100+ companies</span></span>
+          <span class="line"><span>to design, build and raise.</span></span>
+        </h2>
+      </div>
+      <p class="testi__lead" data-fade>From first sketch to acquisition, a few of the teams we’ve built with.</p>
     </div>
 
     <ul class="stories" role="list">
-      {stories.map((s) => (
-        <li class="story" data-story>
-          <div class="story__photo" data-story-photo>
+      {stories.map((s, i) => (
+        <li class="story" data-story style={`--i:${i}`}>
+          <div class:list={["story__photo", { "story__photo--crop": s.crop }]} data-story-photo>
             <img src={R2 + s.photo} alt={s.name} loading="lazy" decoding="async" />
           </div>
           <div class="story__body">
@@ -81,21 +85,26 @@ const stories = [
   .testi { position: relative; z-index: 1; background: #fff; color: #0d221a; }
   .testi__inner { max-width: 1440px; margin: 0 auto; padding: var(--sec-pad); display: flex; flex-direction: column; gap: 40px; }
 
-  .testi__head { display: flex; flex-direction: column; }
+  .testi__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; }
+  .testi__lead { margin: 0; max-width: 380px; color: #6b6b70; font-size: var(--t-lead); line-height: 1.5; }
   .testi__title { margin: 0; font-size: var(--t-h2); font-weight: 400; line-height: 1.1; letter-spacing: -0.02em; }
   .line { display: block; overflow: hidden; padding-bottom: .08em; margin-bottom: -.08em; }
   .line > span { display: inline-block; }
 
-  .stories { display: flex; flex-direction: column; gap: 16px; margin: 0; padding: 0; list-style: none; }
+  .stories { width: 100%; max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; padding: 0; list-style: none; }
   .story {
     display: grid;
-    grid-template-columns: 200px minmax(0, 1fr) 1px 240px;
-    gap: 0 36px;
+    grid-template-columns: 180px minmax(0, 1fr) 1px 200px;
+    gap: 0 32px;
     padding: 14px;
     background: #f6f6f7;
+    border: 1px solid #ececef;
+    transform-origin: 50% 0;
   }
-  .story__photo { position: relative; aspect-ratio: 200 / 216; overflow: hidden; background: #e6e6e9; }
-  .story__photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; filter: grayscale(1) contrast(1.05); }
+  .story__photo { position: relative; aspect-ratio: 180 / 200; overflow: hidden; background: #e6e6e9; }
+  .story__photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; filter: grayscale(1) contrast(1.05); transform-origin: 50% 0; }
+  /* taller than the frame and pinned to the top: the bottom strip (with the watermark) falls outside */
+  .story__photo--crop img { height: 122%; object-position: 62% 0; }
   .story__body { display: flex; flex-direction: column; justify-content: space-between; gap: 24px; padding: 10px 0; }
   .story__quote { margin: 0; max-width: 560px; font-size: 18px; line-height: 1.45; color: #141414; }
   .story__who { display: flex; align-items: center; gap: 14px; }
@@ -121,7 +130,7 @@ const stories = [
   .story__unit { font-size: .4em; letter-spacing: -0.01em; margin-left: 4px; }
   .story__caption { font-size: 13px; color: #6b6b70; }
 
-  .testi__cta { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding-top: 8px; }
+  .testi__cta { width: 100%; max-width: 1040px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 24px; padding-top: 8px; }
   .testi__cta-text { margin: 0; font-size: 16px; color: #141414; }
   .testi__btn {
     display: inline-flex;
@@ -137,7 +146,13 @@ const stories = [
   }
   .testi__btn:hover { background: #79f2ff; color: #141414; }
 
+  /* desktop: cards stack on scroll — each one sticks under the header and the next slides over it */
+  @media (min-width: 769px) {
+    .story { position: sticky; top: calc(var(--header-h, 64px) + 40px + var(--i) * 14px); }
+  }
+
   @media (max-width: 1100px) {
+    .testi__head { flex-direction: column; align-items: flex-start; gap: 16px; }
     .story { grid-template-columns: 180px minmax(0, 1fr) 1px 180px; gap: 0 28px; }
     .story__quote { font-size: 17px; }
     .story__num { font-size: 48px; }

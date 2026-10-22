@@ -25,7 +25,22 @@ export function initTestimonials() {
       )
       .fromTo(section.querySelectorAll("[data-fade]"), { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0);
 
-    section.querySelectorAll<HTMLElement>("[data-story]").forEach((story) => {
+    const stories = Array.from(section.querySelectorAll<HTMLElement>("[data-story]"));
+
+    // stacking: while the next card slides over, the covered one sinks back a little and dims
+    if (!mobile) {
+      stories.slice(0, -1).forEach((story, i) => {
+        const next = stories[i + 1];
+        const content = story.querySelectorAll(":scope > *");
+        const tl = gsap.timeline({
+          scrollTrigger: { trigger: next, start: "top 85%", end: () => `top ${parseFloat(getComputedStyle(next).top) || 120}px`, scrub: 0.4 },
+        });
+        tl.to(story, { scale: 0.95 - (stories.length - 2 - i) * 0.02, ease: "none" }, 0)
+          .to(content, { opacity: 0.35, ease: "none" }, 0);
+      });
+    }
+
+    stories.forEach((story) => {
       const img = story.querySelector("[data-story-photo] img");
       const texts = story.querySelectorAll("[data-story-text]");
       const rule = story.querySelector("[data-story-rule]");
