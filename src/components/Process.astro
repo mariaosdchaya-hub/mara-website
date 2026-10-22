@@ -182,10 +182,11 @@ const pixels = await Promise.all(
 
   .step__art {
     position: absolute;
-    top: calc(var(--top) * var(--u));
+    /* --k enlarges the art around its own centre */
+    top: calc((var(--top) + var(--h) * (1 - var(--k, 1)) / 2) * var(--u));
     left: 50%;
-    width: calc(var(--w) * var(--u));
-    height: calc(var(--h) * var(--u));
+    width: calc(var(--w) * var(--k, 1) * var(--u));
+    height: calc(var(--h) * var(--k, 1) * var(--u));
     transform: translateX(calc(-50% + var(--dx) * var(--u)));
     mix-blend-mode: multiply;
     pointer-events: none;
@@ -312,7 +313,10 @@ const pixels = await Promise.all(
       padding: 22px;
       container-type: size;
     }
-    .step__art { --u: calc(100cqh / 430); }
+    .step__art { --u: calc(100cqh / 430); --k: 1.32; }
+    /* short cards (small laptop screens): no room to enlarge the art around title and text */
+    @container (max-height: 320px) { .step__art { --k: 1.08; } }
+    @container (max-height: 250px) { .step__art { --k: 0.95; } }
     .step__text { font-size: 13px; }
     .step--cta { padding: 26px; }
   }

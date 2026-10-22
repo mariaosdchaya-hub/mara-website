@@ -1,10 +1,10 @@
 /**
  * Selected work — card deck you flip through with scroll.
  *
- * The first case lies in front, full size, with its title and arrow; the next cases wait
- * behind it, each peeking out above as a strip, smaller and tilted back. Scrolling flips
- * the front card forward and down out of the deck, and the next one slides forward to take
- * its place. Snaps to whole cards. Entering the section, the deck pulls back from a close-up.
+ * The first case lies on top, flat and full size, with its title and arrow; the next cases wait
+ * under it, each peeking out below as a strip and each one turned back a little more than the
+ * one before. Scrolling lifts the front card up and away, and the next one rises to take its
+ * place. Snaps to whole cards. Entering the section, the deck pulls back from a close-up.
  */
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -12,9 +12,9 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 // geometry, in card heights (H) unless noted
-const STRIP = 0.11; // how much of each waiting card peeks out above the one in front
-const DEPTH = 70; // px each waiting card sits further from the camera
-const LEAN = 10; // deg, waiting cards lean back
+const STRIP = 0.075; // how much of each waiting card peeks out below the one in front
+const PERSP = 1500; // px, matches .stack__stage perspective
+const LEAN = 9; // deg per step: each waiting card is turned back more than the previous one
 const SHOWN = 3; // waiting cards visible behind the front one
 const PER_CARD = 0.55; // viewport heights of scroll per flip
 
@@ -46,24 +46,29 @@ export function initWorkStack() {
   const render = () => {
     const H = cards[0].offsetHeight;
     const groupH = H + SHOWN * STRIP * H;
-    const baseY = (stage.offsetHeight - groupH) / 2 + SHOWN * STRIP * H; // top of the front card
+    const baseY = (stage.offsetHeight - groupH) / 2; // top of the front card
+    const oy = stage.offsetHeight * 0.3; // perspective-origin (CSS: 50% 30%)
 
     for (let i = 0; i < n; i++) {
       const d = i - state.p;
       const el = cards[i];
       let y: number, z = 0, rx: number, opacity = 1, shade = 0, zi: number;
       if (d < 0) {
-        // flipping out: the top edge tips towards the viewer and the card falls away down
+        // leaving: the card lifts up and away, tipping its top edge towards the viewer
         const t = clamp01(-d);
-        y = baseY + smooth(t) * 0.35 * H;
-        rx = -smooth(t) * 100;
-        opacity = 1 - smooth(clamp01((t - 0.45) / 0.55));
+        y = baseY - smooth(t) * 0.55 * H;
+        z = smooth(t) * 60;
+        rx = -smooth(t) * 24;
+        opacity = 1 - smooth(clamp01((t - 0.25) / 0.6));
         zi = 300;
       } else {
         const k = d;
-        y = baseY - k * STRIP * H;
-        z = -k * DEPTH;
-        rx = Math.min(k, 1) * LEAN;
+        // pivots on the top edge, so the bottom edge turns away from the viewer — more for each card.
+        // Place the card so its *projected* bottom edge peeks out k strips below the front card.
+        const a = (k * LEAN * Math.PI) / 180;
+        const target = baseY + H + k * STRIP * H;
+        y = oy + ((target - oy) * (PERSP + H * Math.sin(a))) / PERSP - H * Math.cos(a);
+        rx = -k * LEAN;
         opacity = k > SHOWN ? clamp01(SHOWN + 1 - k) : 1;
         shade = Math.min(k, SHOWN) * 0.05;
         zi = 200 - Math.round(k * 10);

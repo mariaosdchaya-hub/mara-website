@@ -111,7 +111,7 @@ const count = cases.length;
     padding: 0;
     list-style: none;
     perspective: 1500px;
-    perspective-origin: 50% -25%; /* camera above the drawer */
+    perspective-origin: 50% 30%;
     /* flat stacking: cards keep DOM / z-index order, so nearer folders always overlap farther ones */
     transform-origin: 50% 40%;
   }
@@ -122,10 +122,10 @@ const count = cases.length;
     width: var(--card-w);
     aspect-ratio: 1002 / 529;
     margin-left: calc(var(--card-w) / -2);
-    transform-origin: 50% 100%;
+    transform-origin: 50% 0;
     backface-visibility: hidden;
     will-change: transform;
-    box-shadow: 0 -4px 14px rgba(0, 0, 0, .12);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .16);
   }
   .card__info, .card__tags { transition: opacity .3s ease; }
   .work.is-3d .card:not(.is-lifted) .card__info { opacity: 0; }
