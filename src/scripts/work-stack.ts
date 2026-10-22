@@ -1,5 +1,6 @@
 /**
- * Selected work — card deck you flip through with scroll.
+ * Selected work — card deck you flip through with scroll, which then turns into a row of
+ * compact cards (every case + a "Let's talk" card) that scrolls sideways under a nav bar.
  *
  * The first case lies on top, flat and full size, with its title and arrow; the next cases wait
  * under it, each peeking out below as a strip and each one turned back a little more than the
@@ -33,7 +34,8 @@ export function initWorkStack() {
   if (!section || !stack) return;
 
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reduce) return; // static list fallback (CSS)
+  const desktop = window.matchMedia("(min-width: 1101px)").matches;
+  if (reduce || !desktop) return initNativeReel(section); // swipe row (CSS), arrows + progress wired here
 
   section.classList.add("is-3d");
   const stage = stack.querySelector<HTMLElement>(".stack__stage")!;
@@ -45,7 +47,37 @@ export function initWorkStack() {
   const reveals = section.querySelectorAll<HTMLElement>("[data-reveal]");
   const n = cards.length;
 
-  const state = { p: 0 }; // which card is in front (float while flipping)
+  const reel = section.querySelector<HTMLElement>("[data-reel]")!;
+  const track = section.querySelector<HTMLElement>("[data-reel-track]")!;
+  const rcards = Array.from(section.querySelectorAll<HTMLElement>("[data-rcard]"));
+  const metas = section.querySelectorAll<HTMLElement>(".stack__meta");
+  const nav = navRefs(section);
+  const m = rcards.length;
+
+  const state = { p: 0, t: 0, x: 0 }; // deck position · deck→row transition · row scroll (0..1)
+  const len = { deck: 0, trans: 0, row: 0, dist: 0, total: 1 };
+  const measure = () => {
+    const vh = window.innerHeight;
+    len.deck = Math.max(1, n - 1) * vh * PER_CARD;
+    len.trans = vh * 0.5;
+    // the row may run past the right content edge to the viewport edge; it stops when its end meets the content edge
+    const right = reel.getBoundingClientRect().left + reel.clientWidth;
+    len.dist = Math.max(0, track.scrollWidth - (right - reel.getBoundingClientRect().left));
+    len.row = Math.max(vh * 0.4, len.dist);
+    len.total = len.deck + len.trans + len.row;
+  };
+  const renderReel = () => {
+    const t = state.t, e = smooth(t);
+    stage.style.opacity = String(1 - e);
+    stage.style.transform = `scale(${1 - 0.18 * e}) translateY(${-4 * e}%)`;
+    stage.style.visibility = t >= 1 ? "hidden" : "";
+    metas.forEach((el) => (el.style.opacity = String(1 - e)));
+    reel.style.opacity = String(e);
+    track.style.transform = `translate3d(${((1 - e) * 160 - state.x * len.dist).toFixed(1)}px, 0, 0)`;
+    section.classList.toggle("is-reel", t > 0.5);
+    const cur = Math.round(state.x * (m - 1));
+    nav.setProgress(state.x, cur, m);
+  };
   let st: ScrollTrigger | undefined;
   let lastLabel = -1;
 
@@ -132,21 +164,50 @@ export function initWorkStack() {
       },
     );
 
-    // pinned: scroll flips through the deck, snapping to whole cards
-    // desktop pins the whole section (title stays in view); smaller screens pin just the deck
-    const pinEl = window.matchMedia("(min-width: 1101px)").matches ? section : stack;
+    // pinned: scroll flips through the deck (snapping to whole cards), turns it into the row, then scrolls the row
+    const pinEl = section;
+    measure();
     st = ScrollTrigger.create({
       trigger: pinEl,
       start: () => `top ${header?.offsetHeight ?? 0}px`,
-      end: () => `+=${Math.max(1, n - 1) * window.innerHeight * PER_CARD}`,
+      end: () => `+=${len.total}`,
       pin: true,
       anticipatePin: 1,
       invalidateOnRefresh: true,
-      snap: n > 1 ? { snapTo: 1 / (n - 1), duration: { min: 0.2, max: 0.5 }, delay: 0.08, ease: "power2.inOut" } : undefined,
+      onRefreshInit: measure,
+      snap: {
+        snapTo: (v: number) => {
+          const sAt = v * len.total;
+          if (sAt > len.deck + len.trans) return v; // free scrolling along the row
+          const points = Array.from({ length: n }, (_, k) => (k / Math.max(1, n - 1)) * len.deck).concat(len.deck + len.trans);
+          const best = points.reduce((a, b) => (Math.abs(b - sAt) < Math.abs(a - sAt) ? b : a));
+          return best / len.total;
+        },
+        duration: { min: 0.2, max: 0.5 },
+        delay: 0.08,
+        ease: "power2.inOut",
+      },
       onUpdate: (self) => {
-        gsap.to(state, { p: self.progress * (n - 1), duration: 0.3, ease: "power2.out", overwrite: "auto", onUpdate: render });
+        const sAt = self.progress * len.total;
+        const p = Math.min(1, sAt / len.deck) * (n - 1);
+        const t = clamp01((sAt - len.deck) / len.trans);
+        const x = clamp01((sAt - len.deck - len.trans) / len.row);
+        gsap.to(state, {
+          p, t, x, duration: 0.3, ease: "power2.out", overwrite: "auto",
+          onUpdate: () => { render(); renderReel(); },
+        });
       },
     });
+
+    // arrows: jump the scroll to the previous / next card of the row
+    const goTo = (j: number) => {
+      if (!st) return;
+      const k = Math.max(0, Math.min(m - 1, j));
+      const sAt = len.deck + len.trans + len.row * (k / Math.max(1, m - 1));
+      window.scrollTo({ top: st.start + sAt, behavior: "smooth" });
+    };
+    nav.onPrev(() => goTo(Math.round(state.x * (m - 1)) - 1));
+    nav.onNext(() => goTo(Math.round(state.x * (m - 1)) + 1));
   }, section);
 
   // keyboard: tabbing to a card scrolls the deck to it
@@ -160,11 +221,54 @@ export function initWorkStack() {
   const ro = new ResizeObserver(render);
   ro.observe(stack);
   render();
+  renderReel();
 
   return () => {
     ctx.revert();
     ro.disconnect();
     listeners.forEach((off) => off());
-    section.classList.remove("is-3d");
+    section.classList.remove("is-3d", "is-reel");
+    nav.off();
   };
+}
+
+/** Nav bar under the row: progress line, "03 / 09" counter, prev / next buttons. */
+function navRefs(section: HTMLElement) {
+  const fill = section.querySelector<HTMLElement>("[data-wnav-fill]");
+  const count = section.querySelector<HTMLElement>("[data-wnav-count]");
+  const prev = section.querySelector<HTMLButtonElement>("[data-wnav-prev]");
+  const next = section.querySelector<HTMLButtonElement>("[data-wnav-next]");
+  const offs: Array<() => void> = [];
+  const pad = (v: number) => String(v).padStart(2, "0");
+  return {
+    setProgress(x: number, cur: number, total: number) {
+      fill?.style.setProperty("--p", x.toFixed(4));
+      if (count) count.textContent = `${pad(cur + 1)} / ${pad(total)}`;
+      if (prev) prev.disabled = cur <= 0;
+      if (next) next.disabled = cur >= total - 1;
+    },
+    onPrev(fn: () => void) { prev?.addEventListener("click", fn); offs.push(() => prev?.removeEventListener("click", fn)); },
+    onNext(fn: () => void) { next?.addEventListener("click", fn); offs.push(() => next?.removeEventListener("click", fn)); },
+    off() { offs.forEach((f) => f()); },
+  };
+}
+
+/** Tablet / phone / reduced motion: no deck, the row is a native swipe row; wire arrows + progress to it. */
+function initNativeReel(section: HTMLElement) {
+  const reel = section.querySelector<HTMLElement>("[data-reel]");
+  const cards = Array.from(section.querySelectorAll<HTMLElement>("[data-rcard]"));
+  if (!reel || !cards.length) return;
+  const nav = navRefs(section);
+  const step = () => cards[0].offsetWidth + 12;
+  const update = () => {
+    const max = reel.scrollWidth - reel.clientWidth;
+    const x = max > 0 ? reel.scrollLeft / max : 0;
+    nav.setProgress(x, Math.round(reel.scrollLeft / step()), cards.length);
+  };
+  const smoothBehavior: ScrollBehavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+  nav.onPrev(() => reel.scrollBy({ left: -step(), behavior: smoothBehavior }));
+  nav.onNext(() => reel.scrollBy({ left: step(), behavior: smoothBehavior }));
+  reel.addEventListener("scroll", update, { passive: true });
+  update();
+  return () => { nav.off(); reel.removeEventListener("scroll", update); };
 }

@@ -5,7 +5,9 @@ import { Image } from "astro:assets";
 
 const cases = (await getCollection("cases", ({ data }) => !data.draft && data.featured)).sort(
   (a, b) => a.data.order - b.data.order,
-).slice(0, 4); // the homepage shows 4; the rest live behind "View all projects"
+).slice(0, 4); // the deck shows the first 4 featured cases
+// the row after the deck shows every case (deck ones included), then a "Let's talk" card
+const reel = (await getCollection("cases", ({ data }) => !data.draft)).sort((a, b) => a.data.order - b.data.order);
 const allProjects = "https://www.behance.net/mara-bureau";
 const count = cases.length;
 ---
@@ -24,8 +26,6 @@ const count = cases.length;
       <span class="stack__label">Case</span>
       <span class="stack__name" data-stack-index>01</span>
     </div>
-
-    <a class="btn-ghost stack__all" href={allProjects} target="_blank" rel="noopener">View all projects <Icon name="Arrow--up-right" size={14} /></a>
 
     <ul class="stack__stage" role="list">
       {cases.map((c, i) => (
@@ -58,15 +58,53 @@ const count = cases.length;
         </li>
       ))}
     </ul>
+    <!-- row of compact cards the deck turns into (desktop), or a swipe row (tablet / phone) -->
+    <div class="reel" data-reel>
+      <ul class="reel__track" role="list" data-reel-track>
+        {reel.map((c) => (
+          <li class="rcard" data-rcard>
+            <a class="rcard__link" href={c.data.link}>
+              <Image class="rcard__img" src={c.data.cover} alt={c.data.coverAlt} widths={[400, 640]} sizes="300px" loading="lazy" decoding="async" />
+              {c.data.tags.length > 0 && (
+                <ul class="rcard__tags" role="list">{c.data.tags.slice(0, 2).map((t) => <li>{t}</li>)}</ul>
+              )}
+              <span class="rcard__info">
+                <span class="rcard__title">{c.data.title}</span>
+                <span class="rcard__sum">{c.data.summary}</span>
+              </span>
+            </a>
+          </li>
+        ))}
+        <li class="rcard rcard--cta" data-rcard>
+          <a class="rcard__link" href="#contact">
+            <span class="rcard__label">( Let’s talk )</span>
+            <span class="rcard__cta">
+              <span class="rcard__cta-title">Building something similar?</span>
+              <span class="rcard__cta-btn">Let’s talk <Icon name="Arrow--up-right" size={14} /></span>
+            </span>
+          </a>
+        </li>
+      </ul>
+    </div>
   </div>
-  <div class="work__all">
-    <a class="btn-ghost" href={allProjects} target="_blank" rel="noopener">View all projects <Icon name="Arrow--up-right" size={14} /></a>
+
+  <div class="wnav" data-wnav>
+    <div class="wnav__progress" aria-hidden="true">
+      <span class="wnav__track"><span class="wnav__fill" data-wnav-fill></span></span>
+      <span class="wnav__count" data-wnav-count>01 / {String(reel.length + 1).padStart(2, "0")}</span>
+    </div>
+    <div class="wnav__controls">
+      <button type="button" class="wnav__btn" aria-label="Previous project" data-wnav-prev><Icon name="Arrow--left" size={16} /></button>
+      <button type="button" class="wnav__btn" aria-label="Next project" data-wnav-next><Icon name="Arrow--right" size={16} /></button>
+      <a class="btn-ghost wnav__all" href={allProjects} target="_blank" rel="noopener">View all projects <Icon name="Arrow--up-right" size={14} /></a>
+    </div>
   </div>
 </section>
 
 <style>
   .work {
     position: relative;
+    overflow-x: clip; /* the row runs out to the viewport edge */
     background: #fff;
     color: #0d221a;
     padding: 96px 56px 0;
@@ -240,8 +278,6 @@ const count = cases.length;
   .btn-ghost:hover { border-color: #0d221a; background: rgba(13, 34, 26, .03); }
   .btn-ghost :global(svg) { transition: transform .25s cubic-bezier(.2, .7, .2, 1); }
   .btn-ghost:hover :global(svg) { transform: translate(2px, -2px); }
-  .stack__all { position: absolute; right: 0; bottom: 32px; z-index: 200; background: #fff; }
-  .work__all { display: none; justify-content: center; padding: 40px 0 0; }
   .stack__label { color: #6b6b70; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
   .stack__name { color: #0d221a; }
 
@@ -265,33 +301,75 @@ const count = cases.length;
       container-type: size;
       --card-w: min(1002px, 100cqw - 320px, 100cqh * 1.3);
     }
-    .work.is-3d .stack__all { bottom: 0; }
   }
 
-  /* no-JS / reduced motion: simple vertical list */
-  .work:not(.is-3d) .stack { height: auto; min-height: 0; padding: 64px 0 120px; }
-  .work:not(.is-3d) .stack__stage { position: static; display: grid; gap: 24px; perspective: none; }
-  .work:not(.is-3d) .card { position: relative; left: auto; top: auto; margin: 0 auto; width: min(1002px, 100%); }
-  .work:not(.is-3d) .stack__meta, .work:not(.is-3d) .stack__all { display: none; }
-  .work:not(.is-3d) .work__all { display: flex; }
+
+  /* ---------- reel: row of compact cards after the deck ---------- */
+  .reel { --rc-h: min(252px, 100%); }
+  .reel__track { display: flex; gap: 12px; margin: 0; padding: 0; list-style: none; }
+  .rcard { flex: none; width: 264px; aspect-ratio: 264 / 252; }
+  .rcard__link { position: relative; display: block; height: 100%; overflow: hidden; background: #f6f6f7; color: #fff; }
+  .rcard__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
+  .rcard__link::after { content: ""; position: absolute; inset: 45% 0 0; background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, .78)); }
+  .rcard__link:hover .rcard__img { transform: scale(1.04); }
+  .rcard__tags { position: absolute; z-index: 1; top: 12px; left: 12px; display: flex; gap: 4px; margin: 0; padding: 0; list-style: none; }
+  .rcard__tags li { padding: 3px 6px; border-radius: 2px; background: rgba(20, 20, 20, .45); font-size: 10px; line-height: 1.3; }
+  .rcard__info { position: absolute; z-index: 1; left: 16px; right: 16px; bottom: 14px; display: flex; flex-direction: column; gap: 2px; }
+  .rcard__title { font-size: 15px; font-weight: 500; }
+  .rcard__sum { color: #cfcfd4; font-size: 12px; line-height: 1.4; }
+  .rcard__link:focus-visible { outline: 2px solid #79f2ff; outline-offset: 3px; }
+  .rcard--cta .rcard__link { display: flex; flex-direction: column; justify-content: space-between; padding: 20px; background: #0d221a; }
+  .rcard--cta .rcard__link::after { display: none; }
+  .rcard__label { color: #79f2ff; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
+  .rcard__cta { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+  .rcard__cta-title { font-size: 20px; line-height: 1.2; max-width: 11em; }
+  .rcard__cta-btn { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 4px; background: #79f2ff; color: #141414; font-size: 14px; font-weight: 500; transition: background-color .2s; }
+  .rcard--cta .rcard__link:hover .rcard__cta-btn { background: #fff; }
+
+  /* ---------- navigation under the row ---------- */
+  .wnav { max-width: 1328px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+  .wnav__progress { display: flex; align-items: center; gap: 16px; }
+  .wnav__track { position: relative; display: block; width: 240px; height: 2px; background: #e2e2e6; overflow: hidden; }
+  .wnav__fill { position: absolute; inset: 0; background: #0d221a; transform: scaleX(var(--p, 0)); transform-origin: 0 50%; }
+  .wnav__count { color: #6b6b70; font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .wnav__controls { display: flex; align-items: center; gap: 8px; }
+  .wnav__btn { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 1px solid #c9cbcf; border-radius: 4px; background: #fff; color: #0d221a; cursor: pointer; transition: border-color .2s, opacity .2s; }
+  .wnav__btn:hover { border-color: #0d221a; }
+  .wnav__btn:disabled { opacity: .35; cursor: default; border-color: #c9cbcf; }
+  .wnav__btn:focus-visible { outline: 2px solid #79f2ff; outline-offset: 2px; }
+  .wnav__all { margin-left: 8px; }
+
+  /* desktop deck: the reel waits hidden in the same stage; the nav shows only the button until the row appears */
+  .work.is-3d .reel { position: absolute; inset: 0; display: flex; align-items: center; pointer-events: none; opacity: 0; }
+  .work.is-3d.is-reel .reel { pointer-events: auto; }
+  .work.is-3d .wnav__progress, .work.is-3d .wnav__btn { opacity: 0; visibility: hidden; transition: opacity .3s, visibility .3s; }
+  .work.is-3d.is-reel .wnav__progress, .work.is-3d.is-reel .wnav__btn { opacity: 1; visibility: visible; }
+  .work.is-3d .wnav { flex: none; width: 100%; }
+
+  /* no deck (tablet, phone, reduced motion): the row is a native swipe row */
+  .work:not(.is-3d) .stack__stage, .work:not(.is-3d) .stack__meta { display: none; }
+  .work:not(.is-3d) .stack { height: auto; min-height: 0; padding: 32px 0 24px; }
+  .work:not(.is-3d) .reel { margin: 0 -56px; padding: 0 56px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 56px; scrollbar-width: none; }
+  .work:not(.is-3d) .reel::-webkit-scrollbar { display: none; }
+  .work:not(.is-3d) .rcard { scroll-snap-align: start; }
+  .work:not(.is-3d) .wnav { padding-bottom: 96px; }
 
   @media (max-width: 1100px) {
     .work { padding: 80px 32px 0; }
-    .stack__meta, .stack__all { display: none; }
-    .work__all { display: flex; }
-    .stack { --card-w: min(680px, 70vw, (100svh - var(--header-h, 64px)) * 1.1); }
+    .work:not(.is-3d) .reel { margin: 0 -32px; padding: 0 32px; scroll-padding: 0 32px; }
+    .work:not(.is-3d) .wnav { padding-bottom: 80px; }
   }
   @media (max-width: 768px) {
     .work { padding: 72px 16px 0; }
     .work__head { flex-direction: column; align-items: flex-start; gap: 16px; }
-    .stack { --ratio: 1.25; --card-w: min(86vw, (100svh - var(--header-h, 64px)) * .46); min-height: 520px; }
-    .card { aspect-ratio: 4 / 5; }
-    .card__info { padding: 16px; height: 55%; }
-    .card__title { font-size: 20px; }
-    .card__summary { font-size: 13px; }
-    .card__tags { top: 12px; right: 12px; }
-    .card__tags li { height: 22px; padding: 3px 7px; font-size: 11px; line-height: 16px; }
-    .card__arrow-box { width: 36px; height: 36px; }
+    .work:not(.is-3d) .reel { margin: 0 -16px; padding: 0 16px; scroll-padding: 0 16px; }
+    .rcard { width: 240px; }
+    .wnav { gap: 12px; }
+    .wnav__track { display: none; }
+    .wnav__count { white-space: nowrap; }
+    .wnav__btn { width: 36px; height: 36px; }
+    .wnav__all { margin-left: 4px; height: 36px; padding: 0 12px; font-size: 13px; }
+    .work:not(.is-3d) .wnav { padding-bottom: 72px; }
   }
 </style>
 
