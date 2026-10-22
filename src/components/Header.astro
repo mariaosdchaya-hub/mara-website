@@ -1,4 +1,5 @@
 ---
+import Icon from "./Icon.astro";
 const nav = [
   { label: "Home", href: "/", caret: true },
   { label: "Blog", href: "#", caret: true },
@@ -16,9 +17,7 @@ const nav = [
         <a href={item.href} class="header__link">
           {item.label}
           {item.caret && (
-            <svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true">
-              <path d="M4 6l3.5 3.5L11 6" fill="none" stroke="currentColor" stroke-width="1" />
-            </svg>
+            <Icon name="Chevron--down" size={14} />
           )}
         </a>
       ))}

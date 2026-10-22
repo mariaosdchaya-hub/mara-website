@@ -1,4 +1,5 @@
 ---
+import Icon from "./Icon.astro";
 // Testimonials — featured client stories (Teamway-style: photo · quote · result).
 // Copy and photos from mara.ink ("Trusted by 100+ companies…"); photos are served from the studio's R2 bucket.
 // TODO: the `metric` values are PLACEHOLDERS until real results are confirmed with each client.
@@ -76,7 +77,7 @@ const stories = [
 
     <div class="testi__cta" data-cta>
       <p class="testi__cta-text">Your product could be the next story.</p>
-      <a href="#contact" class="testi__btn">Let’s talk <span aria-hidden="true">↗</span></a>
+      <a href="#contact" class="testi__btn">Let’s talk <Icon name="Arrow--up-right" size={16} /></a>
     </div>
   </div>
 </section>

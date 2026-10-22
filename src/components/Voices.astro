@@ -1,4 +1,5 @@
 ---
+import Icon from "./Icon.astro";
 // "In their words" — founder quotes. Figma: section 4202:2747, copy 4258:2284, cursor tags 4258:2286.
 // The section pins while scrolling and steps through the quotes; two small tags follow the cursor.
 const quotes = [
@@ -39,7 +40,7 @@ const total = String(quotes.length).padStart(2, "0");
       <div class="voices__row voices__row--meta">
         <span>Pre-seed · Seed · Series A</span>
         <span></span>
-        <span class="voices__right voices__hint">Move your cursor ↗</span>
+        <span class="voices__right voices__hint">Move your cursor <Icon name="Arrow--up-right" size={12} /></span>
       </div>
     </div>
   </div>

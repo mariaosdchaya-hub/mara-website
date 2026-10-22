@@ -1,4 +1,5 @@
 ---
+import Icon from "./Icon.astro";
 import { getCollection } from "astro:content";
 import { Image } from "astro:assets";
 
@@ -24,7 +25,7 @@ const count = cases.length;
       <span class="stack__name" data-stack-index>01</span>
     </div>
 
-    <a class="btn-ghost stack__all" href={allProjects} target="_blank" rel="noopener">View all projects <span aria-hidden="true">↗</span></a>
+    <a class="btn-ghost stack__all" href={allProjects} target="_blank" rel="noopener">View all projects <Icon name="Arrow--up-right" size={14} /></a>
 
     <ul class="stack__stage" role="list">
       {cases.map((c, i) => (
@@ -50,7 +51,7 @@ const count = cases.length;
                 <p class="card__summary">{c.data.summary}</p>
               </div>
               <span class="card__arrow" aria-hidden="true">
-                <svg width="56" height="56" viewBox="0 0 56 56"><rect width="56" height="56" rx="4" fill="#fff" /><path d="M23.67 33.45l-1.11-1.11 8.24-8.25h-6.37l.02-1.54h8.99v9.01h-1.55l.02-6.37-8.24 8.26z" fill="#141414" /></svg>
+                <span class="card__arrow-box"><Icon name="Arrow--up-right" size={20} /></span>
               </span>
             </div>
           </a>
@@ -59,7 +60,7 @@ const count = cases.length;
     </ul>
   </div>
   <div class="work__all">
-    <a class="btn-ghost" href={allProjects} target="_blank" rel="noopener">View all projects <span aria-hidden="true">↗</span></a>
+    <a class="btn-ghost" href={allProjects} target="_blank" rel="noopener">View all projects <Icon name="Arrow--up-right" size={14} /></a>
   </div>
 </section>
 
@@ -202,7 +203,7 @@ const count = cases.length;
     letter-spacing: -0.01em;
   }
   .card__summary { margin: 0; color: #bfbfc6; font-size: 14px; line-height: 1.45; }
-  .card__arrow svg { display: block; width: 40px; height: 40px; }
+  .card__arrow-box { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 4px; background: #fff; color: #141414; }
   .card__arrow { position: relative; flex: none; transition: transform .3s cubic-bezier(.2, .7, .2, 1); }
   .card__link:hover .card__arrow { transform: translate(2px, -2px); }
 
@@ -237,8 +238,8 @@ const count = cases.length;
     transition: border-color .2s, background-color .2s;
   }
   .btn-ghost:hover { border-color: #0d221a; background: rgba(13, 34, 26, .03); }
-  .btn-ghost span { transition: transform .25s cubic-bezier(.2, .7, .2, 1); }
-  .btn-ghost:hover span { transform: translate(2px, -2px); }
+  .btn-ghost :global(svg) { transition: transform .25s cubic-bezier(.2, .7, .2, 1); }
+  .btn-ghost:hover :global(svg) { transform: translate(2px, -2px); }
   .stack__all { position: absolute; right: 0; bottom: 32px; z-index: 200; background: #fff; }
   .work__all { display: none; justify-content: center; padding: 40px 0 0; }
   .stack__label { color: #6b6b70; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
@@ -290,7 +291,7 @@ const count = cases.length;
     .card__summary { font-size: 13px; }
     .card__tags { top: 12px; right: 12px; }
     .card__tags li { height: 22px; padding: 3px 7px; font-size: 11px; line-height: 16px; }
-    .card__arrow svg { width: 36px; height: 36px; }
+    .card__arrow-box { width: 36px; height: 36px; }
   }
 </style>
 

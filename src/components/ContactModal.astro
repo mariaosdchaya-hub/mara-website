@@ -1,11 +1,12 @@
 ---
+import Icon from "./Icon.astro";
 // Contact popup — every "#contact" CTA opens it, so visitors don't lose their place on the page.
 import ContactPanel from "./ContactPanel.astro";
 ---
 <dialog class="cmodal" aria-labelledby="cp-title" data-cmodal>
   <div class="cmodal__bg" aria-hidden="true"></div>
   <button type="button" class="cmodal__close" aria-label="Close" data-c-close>
-    <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="1.6" /></svg>
+    <Icon name="Close" size={20} />
   </button>
   <div class="cmodal__inner">
     <ContactPanel context="popup" />

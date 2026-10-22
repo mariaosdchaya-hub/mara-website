@@ -1,4 +1,5 @@
 ---
+import Icon from "./Icon.astro";
 // Project calculator — Figma 4202:2885. Pricing model lives in src/scripts/calculator.ts.
 const types = [
   { id: "landing", label: "Landing page" },
@@ -88,7 +89,7 @@ const groups = [
                     <input type="checkbox" name={o.id} value={o.id} data-opt data-exclusive={o.group} checked={!!o.checked} />
                     <span class="chip__label">{o.label}{o.hint && <span class="chip__hint">{o.hint}</span>}</span>
                     <span class="chip__box" aria-hidden="true">
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6.2l2.3 2.3 4.7-5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                      <Icon name="Checkmark" size={14} />
                     </span>
                   </label>
                 ))}
@@ -211,7 +212,7 @@ const groups = [
   .chip input { position: absolute; opacity: 0; pointer-events: none; }
   .chip__label { display: flex; flex-direction: column; font-size: 14px; font-weight: 500; line-height: 1.3; color: #141414; }
   .chip__hint { font-size: 12px; font-weight: 400; color: #6b6b70; }
-  .chip__box {
+  .chip__box { color: #fff;
     flex: none;
     display: grid;
     place-items: center;
@@ -222,9 +223,9 @@ const groups = [
     background: #fff;
     transition: background-color .2s, border-color .2s;
   }
-  .chip__box svg { opacity: 0; transform: scale(.6); transition: opacity .2s, transform .2s; }
+  .chip__box :global(svg) { opacity: 0; transform: scale(.6); transition: opacity .2s, transform .2s; }
   .chip input:checked ~ .chip__box { background: #141414; border-color: #141414; }
-  .chip input:checked ~ .chip__box svg { opacity: 1; transform: scale(1); }
+  .chip input:checked ~ .chip__box :global(svg) { opacity: 1; transform: scale(1); }
   .chip input:focus-visible ~ .chip__box { outline: 2px solid #79f2ff; outline-offset: 2px; }
 
   /* result */
