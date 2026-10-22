@@ -26,6 +26,7 @@ const logos = [
     ></video>
     <canvas class="hero__seq"></canvas>
     <div class="hero__glow"></div>
+    <div class="hero__shade"></div>
     <div class="hero__fade"></div>
     <div class="hero__white"></div>
   </div>
@@ -91,6 +92,10 @@ const logos = [
   .hero__fade {
     top: auto !important; height: 180px !important;
     background: linear-gradient(0deg, #000 0%, rgba(0,0,0,0) 100%);
+  }
+  /* readability: dark from the bottom-left corner (where the text sits), dissolving towards the top-right */
+  .hero__shade {
+    background: linear-gradient(to top right, rgba(0, 0, 0, .88) 0%, rgba(0, 0, 0, .7) 25%, rgba(0, 0, 0, .3) 50%, rgba(0, 0, 0, 0) 72%);
   }
   .hero__white { background: #fff; opacity: 0; }
 
