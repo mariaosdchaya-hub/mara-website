@@ -59,22 +59,45 @@ export function initWorkStack() {
   const measure = () => {
     const vh = window.innerHeight;
     len.deck = Math.max(1, n - 1) * vh * PER_CARD;
-    len.trans = vh * 0.5;
+    len.trans = vh * 0.9;
     // the row may run past the right content edge to the viewport edge; it stops when its end meets the content edge
     const right = reel.getBoundingClientRect().left + reel.clientWidth;
     len.dist = Math.max(0, track.scrollWidth - (right - reel.getBoundingClientRect().left));
     len.row = Math.max(vh * 0.4, len.dist);
     len.total = len.deck + len.trans + len.row;
   };
+  // Deck → row, scrubbed by state.t (0..1), after the LE:MA reference:
+  //   0.00–0.35  the strips close up under the front card (see render) and the deck shrinks a little;
+  //   0.30–0.62  the packed deck slides up and is cut off by the top edge of the stage (clip, no fade);
+  //   0.48–1.00  the row "grows": each card starts as a 2 px grey line and extends down to full height,
+  //              left to right; once a card is fully grown its cover, tags and text fade in.
+  const rparts = rcards.map((c) => ({
+    link: c.querySelector<HTMLElement>(".rcard__link")!,
+    content: c.querySelectorAll<HTMLElement>(".rcard__img, .rcard__tags, .rcard__info, .rcard__label, .rcard__cta"),
+  }));
   const renderReel = () => {
-    const t = state.t, e = smooth(t);
-    stage.style.opacity = String(1 - e);
-    stage.style.transform = `scale(${1 - 0.18 * e}) translateY(${-4 * e}%)`;
-    stage.style.visibility = t >= 1 ? "hidden" : "";
-    metas.forEach((el) => (el.style.opacity = String(1 - e)));
-    reel.style.opacity = String(e);
-    track.style.transform = `translate3d(${((1 - e) * 160 - state.x * len.dist).toFixed(1)}px, 0, 0)`;
-    section.classList.toggle("is-reel", t > 0.5);
+    const t = state.t;
+    const shrink = smooth(clamp01(t / 0.35));
+    const lift = smooth(clamp01((t - 0.3) / 0.32));
+    stack.style.clipPath = t > 0 ? "inset(0 -100vw -100vh -100vw)" : ""; // cut only at the top edge
+    stage.style.transform = `translateY(${(-lift * stage.offsetHeight * 1.05).toFixed(1)}px) scale(${(1 - 0.06 * shrink).toFixed(4)})`;
+    stage.style.visibility = lift >= 1 ? "hidden" : "";
+    metas.forEach((el) => (el.style.opacity = String(1 - smooth(clamp01(t / 0.3)))));
+
+    reel.style.opacity = t > 0.46 ? "1" : "0";
+    const H = rcards[0]?.offsetHeight ?? 0;
+    rparts.forEach((r, i) => {
+      const d = Math.min(i, 6) * 0.055; // cards past the screen edge finish with the last visible one
+      const g = smooth(clamp01((t - 0.48 - d) / 0.2));
+      const c = smooth(clamp01((t - 0.62 - d) / 0.14));
+      r.link.style.clipPath = g >= 1 ? "" : `inset(0 0 ${((H - 2) * (1 - g)).toFixed(1)}px 0)`;
+      r.content.forEach((el) => {
+        el.style.opacity = c.toFixed(3);
+        el.style.filter = c >= 1 ? "" : `blur(${((1 - c) * 6).toFixed(1)}px)`;
+      });
+    });
+    track.style.transform = `translate3d(${(-state.x * len.dist).toFixed(1)}px, 0, 0)`;
+    section.classList.toggle("is-reel", t > 0.85);
     const cur = Math.round(state.x * (m - 1));
     nav.setProgress(state.x, cur, m);
   };
@@ -105,9 +128,11 @@ export function initWorkStack() {
         // Place the card so its *projected* bottom edge peeks out k strips below the front card.
         // pivots on the top edge; place the card so its *projected* bottom edge lands PEEK[k] below the front card
         const kk = Math.min(k, SHOWN);
-        const deg = lerpAt(TILT, kk);
+        // during the deck→row transition the strips close up under the front card (the deck compresses)
+        const open = 1 - smooth(clamp01(state.t / 0.35));
+        const deg = lerpAt(TILT, kk) * open;
         const a = (deg * Math.PI) / 180;
-        const target = baseY + H + lerpAt(PEEK, kk) * H;
+        const target = baseY + H + lerpAt(PEEK, kk) * H * open;
         y = oy + ((target - oy) * (PERSP - H * Math.sin(a))) / PERSP - H * Math.cos(a);
         rx = deg;
         opacity = k > SHOWN ? clamp01(SHOWN + 1 - k) : 1;
