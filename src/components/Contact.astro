@@ -12,8 +12,9 @@ import ContactPanel from "./ContactPanel.astro";
     position: relative;
     z-index: 1;
     overflow: hidden;
-    padding: 96px 56px;
-    min-height: 790px;
+    /* one screen under the header at most */
+    padding: 56px 56px;
+    min-height: min(680px, calc(100svh - var(--header-h, 64px)));
     display: flex;
     align-items: center;
     background: #000100;
