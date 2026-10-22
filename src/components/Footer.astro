@@ -1,0 +1,76 @@
+---
+// Footer — Figma 4208:2371.
+// TODO: Dribbble and Telegram URLs, privacy policy page.
+const cols = [
+  { title: "Navigation", links: [["Home", "#top"], ["Work", "#work"], ["Blog", "#"], ["Contact", "#contact"]] },
+  { title: "Services", links: [["Brand identity", "#services"], ["Website & dev", "#services"], ["MVP & product", "#services"], ["Mobile app", "#services"]] },
+  { title: "Follow", links: [["Behance", "https://www.behance.net/mara-bureau"], ["Dribbble", "https://dribbble.com/"], ["Telegram", "#"]] },
+];
+const year = new Date().getFullYear();
+---
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <a href="#top" class="footer__logo" aria-label="Mara home"><img src="/logo.svg" alt="Mara" width="89" height="20" loading="lazy" /></a>
+        <p class="footer__about">Design, branding and front-end studio for startups. Based in Ukraine, working worldwide.</p>
+        <a class="footer__mail" href="mailto:hello@mara.ink">hello@mara.ink</a>
+      </div>
+      <nav class="footer__cols" aria-label="Footer">
+        {cols.map((c) => (
+          <div class="footer__col">
+            <p class="footer__title">{c.title}</p>
+            <ul role="list">
+              {c.links.map(([label, href]) => (
+                <li><a href={href} {...(href.startsWith("http") ? { target: "_blank", rel: "noopener" } : {})}>{label}</a></li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </nav>
+    </div>
+    <div class="footer__bottom">
+      <p>© {year} Mara. All rights reserved.</p>
+      <div class="footer__legal">
+        <a href="#">Privacy policy</a>
+        <a href="#top" class="footer__top-link">Back to top <span aria-hidden="true">↑</span></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer { position: relative; z-index: 1; background: #020808; color: #fff; }
+  .footer__inner { max-width: 1440px; margin: 0 auto; padding: 88px 56px 40px; }
+  .footer__top { display: flex; justify-content: space-between; gap: 64px; padding-bottom: 72px; border-bottom: 1px solid rgba(255, 255, 255, .12); }
+  .footer__brand { max-width: 380px; }
+  .footer__logo img { display: block; width: 89px; height: auto; }
+  .footer__about { margin: 24px 0 0; color: rgba(255, 255, 255, .6); font-size: 16px; line-height: 1.5; }
+  .footer__mail { display: inline-block; margin-top: 20px; color: #fff; font-size: 24px; letter-spacing: -0.02em; transition: color .2s; }
+  .footer__mail:hover { color: #79f2ff; }
+  .footer__cols { display: flex; gap: 0; }
+  .footer__col { min-width: 157px; }
+  .footer__col:last-child { min-width: 0; }
+  .footer__title { margin: 0 0 24px; color: rgba(255, 255, 255, .45); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
+  .footer__col ul { display: flex; flex-direction: column; gap: 18px; margin: 0; padding: 0; list-style: none; }
+  .footer__col a { color: rgba(255, 255, 255, .9); font-size: 16px; transition: color .2s; }
+  .footer__col a:hover, .footer__legal a:hover { color: #79f2ff; }
+  .footer__bottom { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding-top: 48px; color: rgba(255, 255, 255, .45); font-size: 14px; }
+  .footer__bottom p { margin: 0; }
+  .footer__legal { display: flex; gap: 24px; }
+  .footer__legal a { color: rgba(255, 255, 255, .45); transition: color .2s; }
+  .footer__legal .footer__top-link { color: rgba(255, 255, 255, .8); }
+  .footer a:focus-visible { outline: 2px solid #79f2ff; outline-offset: 3px; }
+
+  @media (max-width: 1100px) {
+    .footer__inner { padding: 72px 32px 32px; }
+    .footer__top { flex-direction: column; gap: 48px; padding-bottom: 48px; }
+  }
+  @media (max-width: 768px) {
+    .footer__inner { padding: 56px 16px 28px; }
+    .footer__cols { flex-wrap: wrap; row-gap: 36px; }
+    .footer__col { min-width: 50%; }
+    .footer__mail { font-size: 20px; }
+    .footer__bottom { flex-direction: column; align-items: flex-start; padding-top: 28px; }
+  }
+</style>

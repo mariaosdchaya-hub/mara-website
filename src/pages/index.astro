@@ -12,6 +12,7 @@ import Calculator from "../components/Calculator.astro";
 import Faq from "../components/Faq.astro";
 import Contact from "../components/Contact.astro";
 import ContactModal from "../components/ContactModal.astro";
+import Footer from "../components/Footer.astro";
 ---
 <!doctype html>
 <html lang="en">
@@ -27,7 +28,7 @@ import ContactModal from "../components/ContactModal.astro";
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet" />
     <link rel="preload" as="image" href="/hero/hero-poster.jpg" fetchpriority="high" />
   </head>
-  <body>
+  <body id="top">
     <Header />
     <main>
       <Hero />
@@ -41,6 +42,7 @@ import ContactModal from "../components/ContactModal.astro";
       <Faq />
       <Contact />
     </main>
+    <Footer />
     <ContactModal />
   </body>
 </html>

@@ -12,12 +12,18 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 // geometry, in card heights (H) unless noted
-const STRIP = 0.075; // how much of each waiting card peeks out below the one in front
+// Figma (Selected Work): strips under the front card show 100, 70 and 45 px of a 529 px card,
+// and get wider at the bottom (1002 → 1040 → 1060 px) — their bottom edges turn towards the viewer.
+const PEEK = [0, 0.19, 0.32, 0.405]; // projected bottom edge of card k, below the front card's bottom, in H
+const TILT = [0, 7, 10, 11.5]; // deg, bottom edge towards the viewer
 const PERSP = 1500; // px, matches .stack__stage perspective
-const LEAN = 9; // deg per step: each waiting card is turned back more than the previous one
 const SHOWN = 3; // waiting cards visible behind the front one
 const PER_CARD = 0.55; // viewport heights of scroll per flip
 
+const lerpAt = (arr: number[], k: number) => {
+  const i = Math.min(Math.floor(k), arr.length - 2);
+  return arr[i] + (arr[i + 1] - arr[i]) * Math.min(1, k - i);
+};
 const smooth = (x: number) => x * x * (3 - 2 * x);
 const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
 
@@ -45,7 +51,7 @@ export function initWorkStack() {
 
   const render = () => {
     const H = cards[0].offsetHeight;
-    const groupH = H + SHOWN * STRIP * H;
+    const groupH = H * (1 + PEEK[SHOWN]);
     const baseY = (stage.offsetHeight - groupH) / 2; // top of the front card
     const oy = stage.offsetHeight * 0.3; // perspective-origin (CSS: 50% 30%)
 
@@ -65,10 +71,13 @@ export function initWorkStack() {
         const k = d;
         // pivots on the top edge, so the bottom edge turns away from the viewer — more for each card.
         // Place the card so its *projected* bottom edge peeks out k strips below the front card.
-        const a = (k * LEAN * Math.PI) / 180;
-        const target = baseY + H + k * STRIP * H;
-        y = oy + ((target - oy) * (PERSP + H * Math.sin(a))) / PERSP - H * Math.cos(a);
-        rx = -k * LEAN;
+        // pivots on the top edge; place the card so its *projected* bottom edge lands PEEK[k] below the front card
+        const kk = Math.min(k, SHOWN);
+        const deg = lerpAt(TILT, kk);
+        const a = (deg * Math.PI) / 180;
+        const target = baseY + H + lerpAt(PEEK, kk) * H;
+        y = oy + ((target - oy) * (PERSP - H * Math.sin(a))) / PERSP - H * Math.cos(a);
+        rx = deg;
         opacity = k > SHOWN ? clamp01(SHOWN + 1 - k) : 1;
         shade = Math.min(k, SHOWN) * 0.05;
         zi = 200 - Math.round(k * 10);

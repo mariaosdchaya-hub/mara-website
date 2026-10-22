@@ -97,7 +97,8 @@ const count = cases.length;
   .stack {
     --ratio: calc(529 / 1002);
     /* folders are narrower than the page so the row and the lifted card both fit */
-    --card-w: min(700px, 50vw, (100svh - var(--header-h, 64px)) * .9);
+    /* Figma: 1002 px card; the group (card + 3 strips ≈ 0.74 × width) must fit the pinned screen */
+    --card-w: min(1002px, 70vw, (100svh - var(--header-h, 64px) - 110px) * 1.33);
     position: relative;
     height: calc(100svh - var(--header-h, 64px));
     min-height: 620px;
