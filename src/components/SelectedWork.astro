@@ -244,6 +244,29 @@ const count = cases.length;
   .stack__label { color: #6b6b70; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
   .stack__name { color: #0d221a; }
 
+  /* desktop: the whole section (title, deck, button) pins as one screen under the header;
+     the card size follows the height that is left for the deck */
+  @media (min-width: 1101px) {
+    .work.is-3d {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: calc(100svh - var(--header-h, 64px));
+      min-height: 600px;
+      padding: 40px 56px 28px;
+    }
+    .work.is-3d .work__head { flex: none; width: 100%; }
+    .work.is-3d .stack {
+      flex: 1 1 0;
+      width: 100%;
+      height: auto;
+      min-height: 0;
+      container-type: size;
+      --card-w: min(1002px, 100cqw - 320px, 100cqh * 1.3);
+    }
+    .work.is-3d .stack__all { bottom: 0; }
+  }
+
   /* no-JS / reduced motion: simple vertical list */
   .work:not(.is-3d) .stack { height: auto; min-height: 0; padding: 64px 0 120px; }
   .work:not(.is-3d) .stack__stage { position: static; display: grid; gap: 24px; perspective: none; }

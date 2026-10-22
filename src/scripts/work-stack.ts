@@ -123,7 +123,7 @@ export function initWorkStack() {
         yPercent: 0,
         ease: "none",
         scrollTrigger: {
-          trigger: stack,
+          trigger: window.matchMedia("(min-width: 1101px)").matches ? section : stack,
           start: "top bottom",
           end: () => `top ${header?.offsetHeight ?? 0}px`,
           scrub: 0.4,
@@ -133,8 +133,10 @@ export function initWorkStack() {
     );
 
     // pinned: scroll flips through the deck, snapping to whole cards
+    // desktop pins the whole section (title stays in view); smaller screens pin just the deck
+    const pinEl = window.matchMedia("(min-width: 1101px)").matches ? section : stack;
     st = ScrollTrigger.create({
-      trigger: stack,
+      trigger: pinEl,
       start: () => `top ${header?.offsetHeight ?? 0}px`,
       end: () => `+=${Math.max(1, n - 1) * window.innerHeight * PER_CARD}`,
       pin: true,
