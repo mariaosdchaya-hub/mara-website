@@ -1,29 +1,35 @@
 /**
- * Selected work — card deck you flip through with scroll, which then turns into a row of
- * compact cards (every case + a "Let's talk" card) that scrolls sideways under a nav bar.
+ * Selected work — a drum of case cards turned by scroll (after the LE:MA reference), which then
+ * hands over to a row of compact cards (every case + a "Let's talk" card) under a nav bar.
  *
- * The first case lies on top, flat and full size, with its title and arrow; the next cases wait
- * under it, each peeking out below as a strip and each one turned back a little more than the
- * one before. Scrolling lifts the front card up and away, and the next one rises to take its
- * place. Snaps to whole cards. Entering the section, the deck pulls back from a close-up.
+ * Drum: every case is on screen at once, as if stuck around a horizontal cylinder.
+ *  - the active card sits in the middle, flat, slightly larger and closer;
+ *  - earlier cases stack above it, each showing a shrinking strip, tilted back and further away;
+ *  - later cases stack below it the same way;
+ *  - scrolling turns the drum continuously (light snap to whole cards).
+ * Exit: the drum keeps turning; cards slide up under the top edge of the stage and are cut off there,
+ * while the row starts growing below — card by card from a 2 px line, the cover resolving as halftone dots.
  */
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// geometry, in card heights (H) unless noted
-// Figma (Selected Work): strips under the front card show 100, 70 and 45 px of a 529 px card,
-// and get wider at the bottom (1002 → 1040 → 1060 px) — their bottom edges turn towards the viewer.
-const PEEK = [0, 0.19, 0.32, 0.405]; // projected bottom edge of card k, below the front card's bottom, in H
-const TILT = [0, 7, 10, 11.5]; // deg, bottom edge towards the viewer
-const PERSP = 1500; // px, matches .stack__stage perspective
-const SHOWN = 3; // waiting cards visible behind the front one
-const PER_CARD = 0.55; // viewport heights of scroll per flip
+// strips (in card heights H) each neighbour shows beyond the one nearer the centre
+const STRIP_UP = [0.27, 0.2, 0.15, 0.115, 0.09, 0.07, 0.055];
+const STRIP_DOWN = [0.3, 0.22, 0.165, 0.125, 0.095, 0.075, 0.06];
+const TILT = 11; // deg per step away from the centre, capped
+const DEPTH = 28; // px further from the camera per step
+const POP = 1.08; // active card scale
+const SHOWN = 3; // neighbours visible on each side
+const PER_CARD = 0.5; // viewport heights of scroll per card
 
-const lerpAt = (arr: number[], k: number) => {
-  const i = Math.min(Math.floor(k), arr.length - 2);
-  return arr[i] + (arr[i + 1] - arr[i]) * Math.min(1, k - i);
+const cumStrip = (arr: number[], k: number) => {
+  // total strip height for k (fractional) steps away from the centre
+  let sum = 0;
+  const whole = Math.floor(k);
+  for (let j = 0; j < whole; j++) sum += arr[Math.min(j, arr.length - 1)];
+  return sum + (k - whole) * arr[Math.min(whole, arr.length - 1)];
 };
 const smooth = (x: number) => x * x * (3 - 2 * x);
 const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
@@ -59,7 +65,7 @@ export function initWorkStack() {
   const measure = () => {
     const vh = window.innerHeight;
     len.deck = Math.max(1, n - 1) * vh * PER_CARD;
-    len.trans = vh * 0.9;
+    len.trans = vh * 1.1;
     // the row may run past the right content edge to the viewport edge; it stops when its end meets the content edge
     const right = reel.getBoundingClientRect().left + reel.clientWidth;
     len.dist = Math.max(0, track.scrollWidth - (right - reel.getBoundingClientRect().left));
@@ -73,27 +79,30 @@ export function initWorkStack() {
   //              left to right; once a card is fully grown its cover, tags and text fade in.
   const rparts = rcards.map((c) => ({
     link: c.querySelector<HTMLElement>(".rcard__link")!,
-    content: c.querySelectorAll<HTMLElement>(".rcard__img, .rcard__tags, .rcard__info, .rcard__label, .rcard__cta"),
+    text: c.querySelectorAll<HTMLElement>(".rcard__tags, .rcard__info, .rcard__label, .rcard__cta"),
   }));
   const renderReel = () => {
     const t = state.t;
-    const shrink = smooth(clamp01(t / 0.35));
-    const lift = smooth(clamp01((t - 0.3) / 0.32));
-    stack.style.clipPath = t > 0 ? "inset(0 -100vw -100vh -100vw)" : ""; // cut only at the top edge
-    stage.style.transform = `translateY(${(-lift * stage.offsetHeight * 1.05).toFixed(1)}px) scale(${(1 - 0.06 * shrink).toFixed(4)})`;
+    // the turning drum slides up under the top edge of the stage and is cut there (no fade)
+    const lift = smooth(clamp01((t - 0.15) / 0.5));
+    stack.style.clipPath = t > 0 ? "inset(0 -100vw -100vh -100vw)" : "";
+    stage.style.transform = `translateY(${(-lift * stage.offsetHeight * 1.1).toFixed(1)}px)`;
     stage.style.visibility = lift >= 1 ? "hidden" : "";
-    metas.forEach((el) => (el.style.opacity = String(1 - smooth(clamp01(t / 0.3)))));
+    metas.forEach((el) => (el.style.opacity = String(1 - smooth(clamp01(t / 0.25)))));
 
-    reel.style.opacity = t > 0.46 ? "1" : "0";
+    // the row grows while the tail of the drum is still leaving
+    reel.style.opacity = t > 0.3 ? "1" : "0";
     const H = rcards[0]?.offsetHeight ?? 0;
     rparts.forEach((r, i) => {
-      const d = Math.min(i, 6) * 0.055; // cards past the screen edge finish with the last visible one
-      const g = smooth(clamp01((t - 0.48 - d) / 0.2));
-      const c = smooth(clamp01((t - 0.62 - d) / 0.14));
+      const d = Math.min(i, 6) * 0.05;
+      const g = smooth(clamp01((t - 0.32 - d) / 0.22));
+      const c = clamp01((t - 0.5 - d) / 0.2);
       r.link.style.clipPath = g >= 1 ? "" : `inset(0 0 ${((H - 2) * (1 - g)).toFixed(1)}px 0)`;
-      r.content.forEach((el) => {
-        el.style.opacity = c.toFixed(3);
-        el.style.filter = c >= 1 ? "" : `blur(${((1 - c) * 6).toFixed(1)}px)`;
+      r.link.style.setProperty("--dot", `${(c * 3.6).toFixed(2)}px`);
+      r.text.forEach((el) => {
+        const ct = smooth(clamp01((c - 0.4) / 0.6));
+        el.style.opacity = ct.toFixed(3);
+        el.style.transform = ct >= 1 ? "" : `translateY(${((1 - ct) * 8).toFixed(1)}px)`;
       });
     });
     track.style.transform = `translate3d(${(-state.x * len.dist).toFixed(1)}px, 0, 0)`;
@@ -106,45 +115,30 @@ export function initWorkStack() {
 
   const render = () => {
     const H = cards[0].offsetHeight;
-    const groupH = H * (1 + PEEK[SHOWN]);
-    const baseY = (stage.offsetHeight - groupH) / 2; // top of the front card
-    const oy = stage.offsetHeight * 0.3; // perspective-origin (CSS: 50% 30%)
+    // centre the whole fan (strips above + card + strips below) in the stage
+    const up = cumStrip(STRIP_UP, SHOWN) * H, down = cumStrip(STRIP_DOWN, SHOWN) * H;
+    const cy = (stage.offsetHeight - (up + H + down)) / 2 + up + H / 2; // centre line of the active card
+    // during the exit the drum keeps turning past the last card
+    const p = state.p + smooth(clamp01(state.t / 0.55)) * (SHOWN + 1);
 
     for (let i = 0; i < n; i++) {
-      const d = i - state.p;
+      const d = i - p;
+      const k = Math.abs(d);
       const el = cards[i];
-      let y: number, z = 0, rx: number, opacity = 1, shade = 0, zi: number;
-      if (d < 0) {
-        // leaving: the card lifts up and away, tipping its top edge towards the viewer
-        const t = clamp01(-d);
-        y = baseY - smooth(t) * 0.55 * H;
-        z = smooth(t) * 60;
-        rx = -smooth(t) * 24;
-        opacity = 1 - smooth(clamp01((t - 0.25) / 0.6));
-        zi = 300;
-      } else {
-        const k = d;
-        // pivots on the top edge, so the bottom edge turns away from the viewer — more for each card.
-        // Place the card so its *projected* bottom edge peeks out k strips below the front card.
-        // pivots on the top edge; place the card so its *projected* bottom edge lands PEEK[k] below the front card
-        const kk = Math.min(k, SHOWN);
-        // during the deck→row transition the strips close up under the front card (the deck compresses)
-        const open = 1 - smooth(clamp01(state.t / 0.35));
-        const deg = lerpAt(TILT, kk) * open;
-        const a = (deg * Math.PI) / 180;
-        const target = baseY + H + lerpAt(PEEK, kk) * H * open;
-        y = oy + ((target - oy) * (PERSP - H * Math.sin(a))) / PERSP - H * Math.cos(a);
-        rx = deg;
-        opacity = k > SHOWN ? clamp01(SHOWN + 1 - k) : 1;
-        shade = Math.min(k, SHOWN) * 0.05;
-        zi = 200 - Math.round(k * 10);
-      }
-      el.style.transform = `translate3d(0, ${y.toFixed(1)}px, ${z.toFixed(1)}px) rotateX(${rx.toFixed(2)}deg)`;
+      const near = smooth(clamp01(1 - k)); // 1 at the centre → 0 one step away
+      const scale = 1 + (POP - 1) * near;
+      // earlier cards: top edge above the active card's top by the strips; later: bottom edge below its bottom
+      const activeTop = cy - H / 2;
+      const yTop = d < 0 ? activeTop - cumStrip(STRIP_UP, k) * H : activeTop + cumStrip(STRIP_DOWN, k) * H;
+      const tilt = Math.min(k, 3) * TILT * (d < 0 ? 1 : -1);
+      const z = -Math.min(k, SHOWN + 1) * DEPTH + near * 30;
+      const opacity = k > SHOWN ? clamp01(SHOWN + 1 - k) : 1;
+      el.style.transform = `translate3d(0, ${yTop.toFixed(1)}px, ${z.toFixed(1)}px) rotateX(${tilt.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
       el.style.opacity = opacity.toFixed(3);
-      el.style.zIndex = String(zi);
+      el.style.zIndex = String(500 - Math.round(k * 20));
       el.style.visibility = opacity < 0.01 ? "hidden" : "";
-      el.style.setProperty("--shade", shade.toFixed(3));
-      el.classList.toggle("is-lifted", Math.abs(d) < 0.35);
+      el.style.setProperty("--shade", (Math.min(k, SHOWN) * 0.06).toFixed(3));
+      el.classList.toggle("is-lifted", k < 0.35 && state.t === 0);
     }
 
     const active = Math.max(0, Math.min(n - 1, Math.round(state.p)));

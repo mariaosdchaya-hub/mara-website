@@ -3,11 +3,9 @@ import Icon from "./Icon.astro";
 import { getCollection } from "astro:content";
 import { Image } from "astro:assets";
 
-const cases = (await getCollection("cases", ({ data }) => !data.draft && data.featured)).sort(
-  (a, b) => a.data.order - b.data.order,
-).slice(0, 4); // the deck shows the first 4 featured cases
-// the row after the deck shows every case (deck ones included), then a "Let's talk" card
-const reel = (await getCollection("cases", ({ data }) => !data.draft)).sort((a, b) => a.data.order - b.data.order);
+// the drum shows every case; the row after it shows them again as compact cards, then a "Let's talk" card
+const cases = (await getCollection("cases", ({ data }) => !data.draft)).sort((a, b) => a.data.order - b.data.order);
+const reel = cases;
 const allProjects = "https://www.behance.net/mara-bureau";
 const count = cases.length;
 ---
@@ -24,7 +22,7 @@ const count = cases.length;
     </div>
     <div class="stack__meta stack__meta--right" aria-hidden="true">
       <span class="stack__label">Case</span>
-      <span class="stack__name" data-stack-index>01</span>
+      <span class="stack__name" data-stack-index>01</span><span class="stack__of"> / {String(count).padStart(2, "0")}</span>
     </div>
 
     <ul class="stack__stage" role="list">
@@ -150,8 +148,8 @@ const count = cases.length;
     margin: 0;
     padding: 0;
     list-style: none;
-    perspective: 1500px;
-    perspective-origin: 50% 30%;
+    perspective: 1400px;
+    perspective-origin: 50% 50%;
     /* flat stacking: cards keep DOM / z-index order, so nearer folders always overlap farther ones */
     transform-origin: 50% 40%;
   }
@@ -162,7 +160,7 @@ const count = cases.length;
     width: var(--card-w);
     aspect-ratio: 1002 / 529;
     margin-left: calc(var(--card-w) / -2);
-    transform-origin: 50% 0;
+    transform-origin: 50% 50%;
     backface-visibility: hidden;
     will-change: transform;
     box-shadow: 0 10px 24px rgba(0, 0, 0, .16);
@@ -259,6 +257,8 @@ const count = cases.length;
   }
   .stack__meta--left { left: 0; }
   .stack__meta--right { right: 0; text-align: right; }
+  .stack__of { color: #9999a1; }
+  .stack__meta--right .stack__name { display: inline; }
 
   /* "View all projects" — ghost button; in the pinned frame on desktop, under the deck on smaller screens */
   .btn-ghost {
@@ -299,7 +299,8 @@ const count = cases.length;
       height: auto;
       min-height: 0;
       container-type: size;
-      --card-w: min(1002px, 100cqw - 320px, 100cqh * 1.3);
+      /* drum: the active card + strips of its neighbours above and below fit the stage height */
+      --card-w: min(880px, 100cqw - 360px, 100cqh * 0.88);
     }
   }
 
@@ -310,6 +311,13 @@ const count = cases.length;
   .rcard { flex: none; width: 264px; aspect-ratio: 264 / 252; }
   .rcard__link { position: relative; display: block; height: 100%; overflow: hidden; background: #e9e9ec; color: #fff; }
   .rcard__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
+  /* halftone reveal: a grid of dots grows until it covers the image (--dot scrubbed in work-stack.ts) */
+  .work.is-3d .rcard__img {
+    -webkit-mask-image: radial-gradient(circle, #000 var(--dot, 3px), transparent calc(var(--dot, 3px) + .6px));
+            mask-image: radial-gradient(circle, #000 var(--dot, 3px), transparent calc(var(--dot, 3px) + .6px));
+    -webkit-mask-size: 5px 5px;
+            mask-size: 5px 5px;
+  }
   .rcard__link::after { content: ""; position: absolute; inset: 45% 0 0; background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, .78)); }
   .rcard__link:hover .rcard__img { transform: scale(1.04); }
   .rcard__tags { position: absolute; z-index: 1; top: 12px; left: 12px; display: flex; gap: 4px; margin: 0; padding: 0; list-style: none; }
