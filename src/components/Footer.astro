@@ -12,7 +12,7 @@ const year = new Date().getFullYear();
   <div class="footer__inner">
     <div class="footer__top">
       <div class="footer__brand">
-        <a href="#top" class="footer__logo" aria-label="Mara home"><img src="/logo.svg" alt="Mara" width="89" height="20" loading="lazy" /></a>
+        <a href="#top" class="footer__logo" aria-label="Mara home"><img src="/logo.svg" alt="Mara" width="72" height="16" loading="lazy" /></a>
         <p class="footer__about">Design, branding and front-end studio for startups. Based in Ukraine, working worldwide.</p>
         <a class="footer__mail" href="mailto:hello@mara.ink">hello@mara.ink</a>
       </div>
@@ -40,37 +40,36 @@ const year = new Date().getFullYear();
 </footer>
 
 <style>
+  /* same scale as the rest of the page: 15 px links, 13 px meta, 12 px labels */
   .footer { position: relative; z-index: 1; background: #020808; color: #fff; }
-  .footer__inner { max-width: 1440px; margin: 0 auto; padding: 88px 56px 40px; }
-  .footer__top { display: flex; justify-content: space-between; gap: 64px; padding-bottom: 72px; border-bottom: 1px solid rgba(255, 255, 255, .12); }
-  .footer__brand { max-width: 380px; }
-  .footer__logo img { display: block; width: 89px; height: auto; }
-  .footer__about { margin: 24px 0 0; color: rgba(255, 255, 255, .6); font-size: 16px; line-height: 1.5; }
-  .footer__mail { display: inline-block; margin-top: 20px; color: #fff; font-size: 24px; letter-spacing: -0.02em; transition: color .2s; }
-  .footer__mail:hover { color: #79f2ff; }
-  .footer__cols { display: flex; gap: 0; }
-  .footer__col { min-width: 157px; }
-  .footer__col:last-child { min-width: 0; }
-  .footer__title { margin: 0 0 24px; color: rgba(255, 255, 255, .45); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
-  .footer__col ul { display: flex; flex-direction: column; gap: 18px; margin: 0; padding: 0; list-style: none; }
-  .footer__col a { color: rgba(255, 255, 255, .9); font-size: 16px; transition: color .2s; }
+  .footer__inner { max-width: 1440px; margin: 0 auto; padding: 64px 56px 28px; }
+  .footer__top { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 64px; padding-bottom: 48px; border-bottom: 1px solid rgba(255, 255, 255, .1); }
+  .footer__brand { max-width: 340px; }
+  .footer__logo img { display: block; width: 72px; height: auto; }
+  .footer__about { margin: 18px 0 0; color: rgba(255, 255, 255, .55); font-size: 14px; line-height: 1.5; }
+  .footer__mail { display: inline-block; margin-top: 16px; color: #fff; font-size: 17px; letter-spacing: -0.01em; border-bottom: 1px solid rgba(255, 255, 255, .25); padding-bottom: 2px; transition: color .2s, border-color .2s; }
+  .footer__mail:hover { color: #79f2ff; border-color: #79f2ff; }
+  .footer__cols { display: flex; gap: 72px; }
+  .footer__title { margin: 0 0 16px; color: rgba(255, 255, 255, .4); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
+  .footer__col ul { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
+  .footer__col a { color: rgba(255, 255, 255, .85); font-size: 14px; line-height: 1.4; transition: color .2s; }
   .footer__col a:hover, .footer__legal a:hover { color: #79f2ff; }
-  .footer__bottom { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding-top: 48px; color: rgba(255, 255, 255, .45); font-size: 14px; }
+  .footer__bottom { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding-top: 24px; color: rgba(255, 255, 255, .4); font-size: 13px; }
   .footer__bottom p { margin: 0; }
   .footer__legal { display: flex; gap: 24px; }
-  .footer__legal a { color: rgba(255, 255, 255, .45); transition: color .2s; }
-  .footer__legal .footer__top-link { color: rgba(255, 255, 255, .8); }
+  .footer__legal a { color: rgba(255, 255, 255, .4); transition: color .2s; }
+  .footer__legal .footer__top-link { color: rgba(255, 255, 255, .75); }
   .footer a:focus-visible { outline: 2px solid #79f2ff; outline-offset: 3px; }
 
   @media (max-width: 1100px) {
-    .footer__inner { padding: 72px 32px 32px; }
-    .footer__top { flex-direction: column; gap: 48px; padding-bottom: 48px; }
+    .footer__inner { padding: 56px 32px 24px; }
+    .footer__top { grid-template-columns: 1fr; gap: 40px; padding-bottom: 40px; }
+    .footer__cols { gap: 56px; }
   }
   @media (max-width: 768px) {
-    .footer__inner { padding: 56px 16px 28px; }
-    .footer__cols { flex-wrap: wrap; row-gap: 36px; }
-    .footer__col { min-width: 50%; }
-    .footer__mail { font-size: 20px; }
-    .footer__bottom { flex-direction: column; align-items: flex-start; padding-top: 28px; }
+    .footer__inner { padding: 48px 16px 24px; }
+    .footer__cols { flex-wrap: wrap; gap: 32px 0; }
+    .footer__col { flex: 0 0 50%; }
+    .footer__bottom { flex-direction: column; align-items: flex-start; padding-top: 20px; gap: 12px; }
   }
 </style>
