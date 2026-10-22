@@ -41,8 +41,11 @@ import ContactPanel from "./ContactPanel.astro";
     align-items: center;
     padding: 96px 56px;
   }
-  .cmodal[open] .cmodal__inner { animation: cmodal-in .6s cubic-bezier(.2, .7, .2, 1) both; }
-  @keyframes cmodal-in { from { transform: translateY(28px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .cmodal[open] .cmodal__inner { animation: cmodal-in .6s cubic-bezier(.2, .7, .2, 1); }
+  /* transform only: animating opacity here turns the wrapper into a backdrop root and the card's blur stops working */
+  @keyframes cmodal-in { from { transform: translateY(28px); } to { transform: none; } }
+  /* in the popup the card sits right over the bright lines: keep it near-solid so nothing shows through */
+  .cmodal :global(.cpanel__card) { background: rgba(18, 18, 20, .94); }
   .cmodal__close {
     position: fixed;
     top: 24px;

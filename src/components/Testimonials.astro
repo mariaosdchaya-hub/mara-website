@@ -147,8 +147,18 @@ const stories = [
   .testi__btn:hover { background: #79f2ff; color: #141414; }
 
   /* desktop: cards stack on scroll — each one sticks under the header and the next slides over it */
+  /* desktop: the section pins under the header (title, subtitle and CTA stay in view)
+     and the stories stack inside a fixed stage — see testimonials-motion.ts */
   @media (min-width: 769px) {
-    .story { position: sticky; top: calc(var(--header-h, 64px) + 40px + var(--i) * 14px); }
+    .testi.is-pinned .testi__inner {
+      min-height: calc(100svh - var(--header-h, 64px));
+      justify-content: center;
+      padding-top: 40px;
+      padding-bottom: 40px;
+      gap: 32px;
+    }
+    .testi.is-pinned .stories { position: relative; height: var(--stage-h, auto); }
+    .testi.is-pinned .story { position: absolute; top: 0; left: 0; right: 0; }
   }
 
   @media (max-width: 1100px) {

@@ -79,11 +79,11 @@ export function initResults() {
       );
     }
 
-    // 4 · worldwide card
+    // 4 · regions row
     if (world) {
       gsap
         .timeline({ scrollTrigger: { trigger: world, start: "top 88%", toggleActions: "play none none reverse" } })
-        .fromTo(world, { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" })
+        .fromTo(world, { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" })
         .fromTo(worldTitle, { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.5, ease: "power2.out" }, 0.25)
         .fromTo(
           cols.map((c) => Array.from(c.children)).flat(),
