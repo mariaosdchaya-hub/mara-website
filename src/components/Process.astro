@@ -10,11 +10,11 @@ import cta from "../assets/process/cta.png";
 
 // art box: w/h = Figma size, top = Figma offset, dx = shift from the card centre, fit = object-fit
 const steps = [
-  { n: "01", title: "Scope", text: "We define your product’s core value and one essential job. Everything else waits, keeping scope creep out.", img: scope, w: 314, h: 249, top: 75, dx: 0, fit: "cover", row: 1, size: "fixed" },
-  { n: "02", title: "Flows", text: "The core user journeys mapped end to end, before a single screen is designed.", img: flows, w: 628, h: 499, top: -48, dx: 6, fit: "contain", row: 1, size: "wide" },
-  { n: "03", title: "Wireframes", text: "Low-fidelity structure for every key screen. Fast to change and align on.", img: wireframes, w: 323, h: 257, top: 80, dx: -5, fit: "cover", row: 1, size: "fixed" },
-  { n: "04", title: "UI Design", text: "The visual system applied. Components and states, ready to build.", img: ui, w: 376, h: 299, top: 44, dx: 4, fit: "cover", row: 2, size: "flex" },
-  { n: "05", title: "Prototype", text: "A clickable build to test the real flow before engineering starts.", img: prototype, w: 554, h: 441, top: 0, dx: -102, fit: "cover", row: 2, size: "flex" },
+  { n: "01", title: "Ideation", text: "We shape the idea into one clear product: who it’s for, the core job, and what ships first.", img: scope, w: 314, h: 249, top: 75, dx: 0, fit: "cover", row: 1, size: "fixed" },
+  { n: "02", title: "HTML Prototype", text: "A quick coded prototype of the core flow, so you can click through the idea before any visual design.", img: flows, w: 628, h: 499, top: -48, dx: 6, fit: "contain", row: 1, size: "wide" },
+  { n: "03", title: "UI Design", text: "The visual system applied to every key screen. Components and states, ready to build.", img: wireframes, w: 323, h: 257, top: 80, dx: -5, fit: "cover", row: 1, size: "fixed" },
+  { n: "04", title: "Prototype", text: "A clickable prototype to test the real flow with users before a line of code.", img: prototype, w: 554, h: 441, top: 0, dx: -102, fit: "cover", row: 2, size: "flex" },
+  { n: "05", title: "Code", text: "Front-end built from the design: pixel-accurate, responsive and ready for your stack.", img: ui, w: 376, h: 299, top: 44, dx: 4, fit: "cover", row: 2, size: "flex" },
   { n: "06", title: "Launch", text: "Design handed off and shipped, with support through release.", img: launch, w: 264, h: 209, top: 96, dx: 4, fit: "cover", row: 2, size: "flex" },
 ];
 
@@ -45,7 +45,7 @@ const pixels = await Promise.all(
         <div
           class="step__art"
           aria-hidden="true"
-          style={`--w:${s.w}px;--h:${s.h}px;--top:${s.top}px;--dx:${s.dx}px;--fit:${s.fit}`}
+          style={`--w:${s.w};--h:${s.h};--top:${s.top};--dx:${s.dx};--fit:${s.fit}`}
           data-art
         >
           <Image src={s.img} alt="" widths={[s.w, s.w * 2]} sizes={`${s.w}px`} loading="lazy" class="step__img step__img--full" />
@@ -182,11 +182,11 @@ const pixels = await Promise.all(
 
   .step__art {
     position: absolute;
-    top: var(--top);
+    top: calc(var(--top) * var(--u));
     left: 50%;
-    width: var(--w);
-    height: var(--h);
-    transform: translateX(calc(-50% + var(--dx)));
+    width: calc(var(--w) * var(--u));
+    height: calc(var(--h) * var(--u));
+    transform: translateX(calc(-50% + var(--dx) * var(--u)));
     mix-blend-mode: multiply;
     pointer-events: none;
   }
@@ -298,6 +298,29 @@ const pixels = await Promise.all(
   .cta__corner--bl { left: -5px; bottom: -5px; }
   .cta__corner--br { right: -5px; bottom: -5px; }
 
+  /* art is laid out in Figma units (card 430 px tall); --u is one unit in px */
+  .step__art { --u: 1px; }
+
+  /* desktop: the whole section fits one screen under the header — the cards take the height that is left */
+  @media (min-width: 1101px) {
+    .process { padding: 48px 56px; }
+    .process__head { margin-bottom: 28px; }
+    .process__title { font-size: 40px; }
+    .process__grid { column-gap: 16px; }
+    .step--row2 { margin-top: 16px; }
+    .step {
+      height: clamp(240px, calc((100svh - var(--header-h, 64px) - 96px - 80px - 28px - 16px) / 2), 430px);
+      padding: 22px;
+      container-type: size;
+    }
+    .step__art { --u: calc(100cqh / 430); }
+    .step__title { font-size: 20px; }
+    .step__num { font-size: 14px; }
+    .step__text { font-size: 13px; }
+    .step--cta { padding: 26px; }
+    .cta__title { font-size: 26px; }
+  }
+
   @media (max-width: 1100px) {
     .process { padding: 80px 32px; }
     .process__grid { row-gap: 24px; }
@@ -316,7 +339,7 @@ const pixels = await Promise.all(
     .step--fixed, .step--cta, .step--flex, .step--wide { flex: 1 1 100%; }
     .step { height: 400px; padding: 24px; }
     .step__title { font-size: 22px; }
-    .step--wide .step__art { --w: 520px; --h: 413px; --top: -20px; }
+    .step--wide .step__art { --w: 520; --h: 413; --top: -20; }
   }
 </style>
 
