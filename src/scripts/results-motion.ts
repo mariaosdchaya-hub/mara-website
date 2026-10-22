@@ -64,17 +64,23 @@ export function initResults() {
     stats.forEach((s) => (s.querySelector<HTMLElement>("[data-count]")!.textContent = "0"));
     ScrollTrigger.create({ trigger: stats[0], start: "top 88%", animation: statsTl, toggleActions: "play none none reverse" });
 
-    // 3 · globe, scrubbed
+    // 3 · globe, scrubbed.
+    // Desktop: the section is exactly one screen, so it pins under the header and the globe opens
+    // while the whole section (title, stats, regions) stays in view. Smaller screens: no pin.
     if (globe && globeImg) {
+      const desktop = window.matchMedia("(min-width: 1101px)").matches;
+      const header = document.querySelector<HTMLElement>(".header");
       gsap.fromTo(
         globeImg,
-        { "--r": "0%", y: 140, scale: 0.86 },
+        { "--r": "0%", y: 50, scale: 0.92 },
         {
           "--r": "85%",
           y: 0,
           scale: 1,
           ease: "none",
-          scrollTrigger: { trigger: globe, start: "top 100%", end: "bottom 45%", scrub: 0.6 },
+          scrollTrigger: desktop
+            ? { trigger: section, start: () => `top ${header?.offsetHeight ?? 0}px`, end: () => `+=${window.innerHeight * 0.6}`, pin: true, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true }
+            : { trigger: globe, start: "top 100%", end: "bottom 45%", scrub: 0.6 },
         },
       );
     }

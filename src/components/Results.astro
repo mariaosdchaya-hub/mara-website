@@ -121,8 +121,6 @@ const regions = [
   /* globe: fills the gap between the stats and the dark card and runs under the card.
      Its width follows the gap height so the same part of the map shows (Figma: 499 of 934 px above the card) */
   .globe { position: relative; z-index: 0; flex: 1 1 0; min-height: 120px; container-type: size; }
-  /* the map sinks into white just above the regions row instead of hitting a wall */
-  .globe::after { content: ""; position: absolute; left: -50vw; right: -50vw; bottom: -4px; height: 144px; background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff 75%); pointer-events: none; z-index: 2; }
   .globe__img, .globe__vignette { --gw: min(1245px, 150vw, 100cqh * 1245 / 499); }
   .globe__img {
     position: absolute;
@@ -134,9 +132,20 @@ const regions = [
   }
   .globe__img img { width: 100%; height: 100%; object-fit: cover; }
   /* scroll reveal: a soft circle opens from the middle of the map (--r is scrubbed in results-motion.ts) */
+  /* two masks, intersected:
+     - a soft circle that opens from the middle of the map on scroll (--r, scrubbed in results-motion.ts);
+     - a fade to transparent over the last 120 px of the globe box, so the map sinks into the page above the regions row.
+       The box bottom in image coordinates is 100cqh + the image's negative top offset. */
   .globe__img {
-    -webkit-mask-image: radial-gradient(circle at 50% 58%, #000 var(--r, 100%), transparent calc(var(--r, 100%) + 18%));
-            mask-image: radial-gradient(circle at 50% 58%, #000 var(--r, 100%), transparent calc(var(--r, 100%) + 18%));
+    --cut: calc(100cqh + var(--gw) * 73 / 1245);
+    -webkit-mask-image:
+      radial-gradient(circle at 50% 58%, #000 var(--r, 100%), transparent calc(var(--r, 100%) + 18%)),
+      linear-gradient(to bottom, #000 calc(var(--cut) - 130px), transparent calc(var(--cut) - 6px));
+    -webkit-mask-composite: source-in;
+            mask-image:
+      radial-gradient(circle at 50% 58%, #000 var(--r, 100%), transparent calc(var(--r, 100%) + 18%)),
+      linear-gradient(to bottom, #000 calc(var(--cut) - 130px), transparent calc(var(--cut) - 6px));
+            mask-composite: intersect;
   }
   .globe__vignette {
     position: absolute;
@@ -158,8 +167,6 @@ const regions = [
     flex: none;
     gap: 16px;
   }
-  /* solid white from just above the row to the bottom of the section: the map never shows below the fade */
-  .world::before { content: ""; position: absolute; z-index: -1; left: -100vw; right: -100vw; top: -30px; bottom: -400px; background: #fff; }
   .world__title { margin: 0; color: #6b6b70; font-size: 12px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase; }
   .world__cols { display: flex; gap: 24px; }
   .world__col { flex: 1 1 0; display: flex; flex-direction: column; gap: 6px; padding-top: 14px; border-top: 1px solid #e2e2e6; }
