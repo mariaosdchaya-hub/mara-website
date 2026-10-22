@@ -47,10 +47,13 @@ const groups = [
 <section class="calc" id="calculator" data-calc>
   <div class="calc__inner">
     <div class="calc__head">
+      <div>
+      <p class="sec-label">( Estimate )</p>
       <h2 class="calc__title" data-split>
         <span class="line"><span>Calculate the cost</span></span>
         <span class="line"><span>of the project</span></span>
       </h2>
+      </div>
       <p class="calc__lead">By selecting the options below, you can see <br />the approximate cost of developing your project.</p>
     </div>
 
@@ -121,11 +124,11 @@ const groups = [
 <style>
   .calc { position: relative; z-index: 1; background: #fff; color: #0d221a; }
   .calc__inner { max-width: 1440px; margin: 0 auto; padding: 96px 56px; display: flex; flex-direction: column; gap: 48px; }
-  .calc__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; }
-  .calc__title { margin: 0; font-size: 48px; font-weight: 400; line-height: 1; letter-spacing: -0.02em; }
+  .calc__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; }
+  .calc__title { margin: 0; font-size: var(--t-h2); font-weight: 400; line-height: 1.1; letter-spacing: -0.02em; }
   .line { display: block; overflow: hidden; padding-bottom: .08em; margin-bottom: -.08em; }
   .line > span { display: inline-block; }
-  .calc__lead { margin: 0; color: #6b6b70; font-size: 18px; line-height: 1.5; }
+  .calc__lead { margin: 0; max-width: 380px; color: #6b6b70; font-size: var(--t-lead); line-height: 1.5; }
 
   .calc__body { display: flex; gap: 40px; align-items: stretch; }
   .calc__form { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
@@ -157,8 +160,8 @@ const groups = [
   /* groups */
   .group { padding: 32px 0; border-bottom: 1px solid #e6e6e9; }
   .group__head { display: flex; align-items: center; gap: 14px; }
-  .group__title { margin: 0; font-size: 24px; font-weight: 500; line-height: 1.25; letter-spacing: -0.005em; color: #141414; }
-  .group__text { margin: 10px 0 0; font-size: 16px; line-height: 1.5; color: #616166; }
+  .group__title { margin: 0; font-size: 17px; font-weight: 500; line-height: 1.25; letter-spacing: -0.005em; color: #141414; }
+  .group__text { margin: 10px 0 0; font-size: 14px; line-height: 1.5; color: #616166; }
 
   .switch { position: relative; display: inline-flex; cursor: pointer; }
   .switch__input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
@@ -206,7 +209,7 @@ const groups = [
   }
   .chip:hover { border-color: #c9cbcf; }
   .chip input { position: absolute; opacity: 0; pointer-events: none; }
-  .chip__label { display: flex; flex-direction: column; font-size: 16px; font-weight: 500; line-height: 1.3; color: #141414; }
+  .chip__label { display: flex; flex-direction: column; font-size: 14px; font-weight: 500; line-height: 1.3; color: #141414; }
   .chip__hint { font-size: 12px; font-weight: 400; color: #6b6b70; }
   .chip__box {
     flex: none;
@@ -237,11 +240,11 @@ const groups = [
     color: #fff;
   }
   .result__overline { margin: 0 0 16px; color: #79f2ff; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
-  .result__title { margin: 0; font-size: 24px; font-weight: 500; line-height: 1.25; letter-spacing: -0.005em; }
+  .result__title { margin: 0; font-size: 18px; font-weight: 500; line-height: 1.25; letter-spacing: -0.005em; }
   .result__bottom { display: flex; flex-direction: column; align-items: flex-start; gap: 20px; }
   .result__price { display: flex; flex-direction: column; gap: 6px; }
   .result__label { margin: 0; color: #9ea3ab; font-size: 14px; line-height: 1.45; }
-  .result__value { margin: 0; font-size: 48px; line-height: 1; letter-spacing: -0.02em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .result__value { margin: 0; font-size: 36px; line-height: 1; letter-spacing: -0.02em; white-space: nowrap; font-variant-numeric: tabular-nums; }
   .result__meta { margin: 4px 0 0; color: #9ea3ab; font-size: 14px; }
   .result__btn {
     display: inline-flex;
@@ -267,14 +270,11 @@ const groups = [
   /* desktop: compact so the whole calculator sits within one screen with room to spare */
   @media (min-width: 1101px) {
     .calc__inner { padding: 48px 56px; gap: 28px; }
-    .calc__title { font-size: 40px; }
-    .calc__lead { font-size: 16px; }
     .calc__body { gap: 32px; }
     .calc__types { padding-bottom: 18px; }
     .calc__legend { margin-bottom: 10px; font-size: 13px; }
     .type span { height: 34px; padding: 0 14px; font-size: 14px; }
     .group { padding: 18px 0; }
-    .group__title { font-size: 20px; }
     .switch__track { width: 38px; height: 21px; }
     .switch__knob { width: 15px; height: 15px; }
     .switch__input:checked + .switch__track .switch__knob { transform: translateX(17px); }
@@ -286,32 +286,25 @@ const groups = [
     .chip__hint { font-size: 11px; }
     .chip__box { width: 20px; height: 20px; }
     .result { flex-basis: 380px; padding: 28px; gap: 28px; }
-    .result__title { font-size: 22px; }
-    .result__value { font-size: 40px; }
     .result__btn { height: 40px; padding: 0 22px; font-size: 15px; }
   }
 
   @media (max-width: 1100px) {
-    .calc__inner { padding: 80px 32px; }
     .calc__head { flex-direction: column; gap: 16px; }
     .calc__body { flex-direction: column; }
     .result { flex-basis: auto; }
     .chips { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
   @media (max-width: 768px) {
-    .calc__inner { padding: 72px 16px; gap: 32px; }
-    .calc__title { font-size: 36px; }
-    .calc__lead { font-size: 15px; }
+    .calc__inner { gap: 32px; }
     .calc__lead br { display: none; }
     .group { padding: 24px 0; }
-    .group__title { font-size: 20px; }
     .group__text { font-size: 14px; }
     .chips { gap: 8px; }
     .group.is-on .chips { padding-top: 18px; }
     .chip { padding: 8px 10px 8px 14px; }
     .chip__label { font-size: 14px; }
     .result { padding: 28px 24px; gap: 32px; }
-    .result__value { font-size: 40px; }
   }
 </style>
 

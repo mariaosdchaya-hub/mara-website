@@ -10,7 +10,7 @@ const count = cases.length;
 ---
 <section class="work" id="work" data-work>
   <div class="work__head">
-    <h2 class="work__title" data-reveal>Selected projects<br />&amp; work</h2>
+    <div><p class="sec-label" data-reveal>( Selected work )</p><h2 class="work__title" data-reveal>Selected projects<br />&amp; work</h2></div>
     <p class="work__note" data-reveal>Products we took from idea to shipped — fintech, AI, web3 and SaaS.</p>
   </div>
 
@@ -75,23 +75,21 @@ const count = cases.length;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
     gap: 32px;
   }
   .work__title {
     margin: 0;
-    font-size: 48px;
+    font-size: var(--t-h2);
     font-weight: 400;
-    line-height: 1;
+    line-height: 1.1;
     letter-spacing: -0.02em;
   }
   .work__note {
     margin: 0;
-    max-width: 486px;
-    font-size: 18px;
+    max-width: 380px;
+    font-size: var(--t-lead);
     line-height: 1.5;
-    letter-spacing: .02em;
-    text-transform: uppercase;
     color: #6b6b70;
   }
 
@@ -197,7 +195,7 @@ const count = cases.length;
   .card__text { position: relative; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
   .card__title {
     margin: 0;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 500;
     line-height: 1.15;
     letter-spacing: -0.01em;
@@ -261,8 +259,6 @@ const count = cases.length;
   @media (max-width: 768px) {
     .work { padding: 72px 16px 0; }
     .work__head { flex-direction: column; align-items: flex-start; gap: 16px; }
-    .work__title { font-size: 36px; }
-    .work__note { font-size: 14px; }
     .stack { --ratio: 1.25; --card-w: min(86vw, (100svh - var(--header-h, 64px)) * .46); min-height: 520px; }
     .card { aspect-ratio: 4 / 5; }
     .card__info { padding: 16px; height: 55%; }

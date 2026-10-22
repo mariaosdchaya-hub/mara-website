@@ -96,23 +96,23 @@ const pixels = await Promise.all(
     z-index: 1;
     background: #fff;
     color: #0d221a;
-    padding: 88px 56px;
+    padding: var(--sec-pad);
   }
   .process__head,
   .process__grid { max-width: 1328px; margin: 0 auto; }
 
   .process__head {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column-reverse;
     align-items: flex-start;
-    gap: 32px;
-    margin-bottom: 48px;
+    gap: 16px;
+    margin-bottom: 40px;
   }
   .process__title {
     margin: 0;
-    font-size: 48px;
+    font-size: var(--t-h2);
     font-weight: 400;
-    line-height: 1;
+    line-height: 1.1;
     letter-spacing: -0.02em;
   }
   .line { display: block; overflow: hidden; padding-bottom: .08em; margin-bottom: -.08em; }
@@ -163,13 +163,13 @@ const pixels = await Promise.all(
   }
   .step__title {
     margin: 0;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 500;
     line-height: 1.25;
     letter-spacing: -0.005em;
     color: #141414;
   }
-  .step__num { font-size: 16px; line-height: 1.5; color: #9999a1; }
+  .step__num { font-size: 13px; line-height: 1.5; color: #9999a1; }
   .step__text {
     position: relative;
     z-index: 2;
@@ -270,7 +270,7 @@ const pixels = await Promise.all(
     letter-spacing: .04em;
     text-transform: uppercase;
   }
-  .cta__title { margin: 0; color: #fff; font-size: 30px; font-weight: 500; line-height: 1.1; }
+  .cta__title { margin: 0; color: #fff; font-size: 22px; font-weight: 500; line-height: 1.1; }
   .cta__btn {
     position: relative;
     display: inline-flex;
@@ -305,24 +305,19 @@ const pixels = await Promise.all(
   @media (min-width: 1101px) {
     .process { padding: 48px 56px; }
     .process__head { margin-bottom: 28px; }
-    .process__title { font-size: 40px; }
     .process__grid { column-gap: 16px; }
     .step--row2 { margin-top: 16px; }
     .step {
-      height: clamp(240px, calc((100svh - var(--header-h, 64px) - 96px - 80px - 28px - 16px) / 2), 430px);
+      height: clamp(200px, calc((100svh - var(--header-h, 64px) - 96px - 112px - 28px - 16px) / 2), 430px);
       padding: 22px;
       container-type: size;
     }
     .step__art { --u: calc(100cqh / 430); }
-    .step__title { font-size: 20px; }
-    .step__num { font-size: 14px; }
     .step__text { font-size: 13px; }
     .step--cta { padding: 26px; }
-    .cta__title { font-size: 26px; }
   }
 
   @media (max-width: 1100px) {
-    .process { padding: 80px 32px; }
     .process__grid { row-gap: 24px; }
     .process__grid::after { display: none; }
     .step, .step--row1, .step--row2 { order: 0; margin-top: 0; }
@@ -330,15 +325,13 @@ const pixels = await Promise.all(
     .step--wide { flex: 1 1 100%; }
   }
   @media (max-width: 768px) {
-    .process { padding: 72px 16px; }
-    .process__head { flex-direction: column-reverse; gap: 16px; margin-bottom: 32px; }
-    .process__title { font-size: 32px; letter-spacing: -0.02em; }
+    .process__head { margin-bottom: 32px; }
     /* the two lines don't fit a phone: let them flow (the reveal falls back to blur + fade) */
     .line, .line > span { display: inline; }
     .line + .line::before { content: " "; }
     .step--fixed, .step--cta, .step--flex, .step--wide { flex: 1 1 100%; }
     .step { height: 400px; padding: 24px; }
-    .step__title { font-size: 22px; }
+    .step__title { font-size: 18px; }
     .step--wide .step__art { --w: 520; --h: 413; --top: -20; }
   }
 </style>

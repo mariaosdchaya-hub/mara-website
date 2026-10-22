@@ -30,11 +30,12 @@ const faqs = [
 <section class="faq" id="faq" data-faq>
   <div class="faq__inner">
     <div class="faq__head">
+      <p class="sec-label" data-fade>( FAQ )</p>
       <h2 class="faq__title" data-split>
         <span class="line"><span>Questions,</span></span>
         <span class="line"><span>answered</span></span>
       </h2>
-      <p class="faq__note" data-fade>The things founders<br />ask us before starting.</p>
+      <p class="faq__note" data-fade>The things founders ask us before starting.</p>
     </div>
 
     <ul class="faq__list" role="list">
@@ -59,13 +60,12 @@ const faqs = [
 
 <style>
   .faq { position: relative; z-index: 1; background: #fff; color: #0d221a; }
-  .faq__inner { max-width: 1440px; margin: 0 auto; padding: 96px 56px; display: flex; gap: 80px; align-items: flex-start; }
-  .faq__head { flex: 0 0 440px; display: flex; flex-direction: column; gap: 24px; position: sticky; top: calc(var(--header-h, 64px) + 40px); }
-  .faq__title { margin: 0; font-size: 48px; font-weight: 400; line-height: 1; letter-spacing: -0.02em; }
-  .faq__title .line + .line { margin-top: 8px; }
+  .faq__inner { max-width: 1440px; margin: 0 auto; padding: var(--sec-pad); display: flex; gap: 80px; align-items: flex-start; }
+  .faq__head { flex: 0 0 380px; display: flex; flex-direction: column; gap: 0; position: sticky; top: calc(var(--header-h, 64px) + 40px); }
+  .faq__title { margin: 0 0 16px; font-size: var(--t-h2); font-weight: 400; line-height: 1.1; letter-spacing: -0.02em; }
   .line { display: block; overflow: hidden; padding-bottom: .08em; margin-bottom: -.08em; }
   .line > span { display: inline-block; }
-  .faq__note { margin: 0; color: #6b6b70; font-size: 18px; line-height: 1.5; letter-spacing: .02em; text-transform: uppercase; }
+  .faq__note { margin: 0; max-width: 340px; color: #6b6b70; font-size: var(--t-lead); line-height: 1.5; }
 
   .faq__list { flex: 1 1 0; min-width: 0; margin: 0; padding: 0; list-style: none; border-bottom: 1px solid #e6e6e9; }
   .faq__item { border-top: 1px solid #e6e6e9; }
@@ -76,14 +76,14 @@ const faqs = [
     align-items: center;
     gap: 24px;
     width: 100%;
-    padding: 26px 0;
+    padding: 22px 0;
     border: 0;
     background: none;
     color: #141414;
     font: inherit;
-    font-size: 20px;
+    font-size: var(--t-h3);
     font-weight: 500;
-    line-height: 1.3;
+    line-height: 1.35;
     text-align: left;
     cursor: pointer;
     transition: color .2s;
@@ -114,9 +114,9 @@ const faqs = [
   .faq__item.is-open .faq__panel { grid-template-rows: 1fr; }
   .faq__a {
     margin: 0;
-    padding: 0 200px 26px 0;
+    padding: 0 120px 22px 0;
     color: #6b6b70;
-    font-size: 16px;
+    font-size: var(--t-text);
     line-height: 1.5;
     opacity: 0;
     transform: translateY(-6px);
@@ -125,16 +125,13 @@ const faqs = [
   .faq__item.is-open .faq__a { opacity: 1; transform: none; transition-delay: .08s; }
 
   @media (max-width: 1100px) {
-    .faq__inner { flex-direction: column; gap: 40px; padding: 80px 32px; }
+    .faq__inner { flex-direction: column; gap: 40px; }
     .faq__head { position: static; flex-basis: auto; }
     .faq__list { width: 100%; }
     .faq__a { padding-right: 48px; }
   }
   @media (max-width: 768px) {
-    .faq__inner { padding: 72px 16px; }
-    .faq__title { font-size: 36px; }
-    .faq__note { font-size: 14px; }
-    .faq__btn { padding: 20px 0; font-size: 17px; }
+    .faq__btn { padding: 18px 0; font-size: 16px; }
     .faq__a { padding: 0 0 20px; font-size: 15px; }
   }
 </style>

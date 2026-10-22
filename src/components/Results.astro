@@ -78,7 +78,7 @@ const regions = [
   .results > * { width: 100%; max-width: 1328px; margin-left: auto; margin-right: auto; }
 
   .results__head { position: relative; z-index: 2; display: flex; align-items: flex-end; gap: 48px; flex: none; }
-  .results__title { flex: none; margin: 0; font-size: 56px; font-weight: 400; line-height: 1; letter-spacing: -0.02em; }
+  .results__title { flex: none; margin: 0; font-size: var(--t-h2); font-weight: 400; line-height: 1.1; letter-spacing: -0.02em; }
   .line { display: block; overflow: hidden; padding-bottom: .08em; margin-bottom: -.08em; }
   .line > span { display: inline-block; }
 
@@ -115,7 +115,7 @@ const regions = [
   }
   .stat.is-done .stat__dot { background: #2fd6e6; box-shadow: 0 0 0 4px rgba(121, 242, 255, .35); }
   .stat__value { display: flex; align-items: flex-start; gap: 3px; color: #141414; white-space: nowrap; }
-  .stat__num { font-size: 40px; font-weight: 400; line-height: .9; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .stat__num { font-size: 36px; font-weight: 400; line-height: .9; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
   .stat__suffix { margin-top: 1px; font-size: 16px; font-weight: 400; line-height: 1; color: #6b6b70; }
 
   /* globe: fills the gap between the stats and the dark card and runs under the card.
@@ -159,14 +159,13 @@ const regions = [
     background: #141414;
     border: 1px solid rgba(0, 0, 0, .09);
   }
-  .world__title { margin: 0; color: #fff; font-size: 30px; }
+  .world__title { margin: 0; color: #fff; font-size: 22px; font-weight: 400; }
   .world__cols { display: flex; gap: 24px; }
   .world__col { flex: 1 1 0; display: flex; flex-direction: column; gap: 8px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, .14); }
-  .world__region { margin: 0; color: #f6f6f7; font-size: 22px; line-height: 1.25; }
+  .world__region { margin: 0; color: #f6f6f7; font-size: 17px; line-height: 1.25; }
   .world__list { margin: 0; color: #8e8e95; font-size: 14px; line-height: 1.45; max-width: 26em; }
 
   @media (max-width: 1360px) {
-    .results__title { font-size: 48px; }
     .results__head { gap: 40px; }
     .stats { gap: 12px; }
     .stat { padding: 16px 16px 18px; }
@@ -182,7 +181,6 @@ const regions = [
   }
   @media (max-width: 768px) {
     .results { padding: 72px 16px; gap: 32px; }
-    .results__title { font-size: 40px; }
     .stats { gap: 12px; }
     .stat { flex-basis: calc(50% - 6px); height: 100px; padding: 14px 14px 16px; }
     .globe { height: 220px; }
@@ -190,11 +188,11 @@ const regions = [
     .stat__num { font-size: 32px; }
     .stat__suffix { font-size: 14px; }
     .world { padding: 24px; gap: 20px; }
-    .world__title { font-size: 26px; }
+    .world__title { font-size: 20px; }
     .world__cols { flex-wrap: wrap; gap: 12px 16px; }
     .world__cols { gap: 20px 16px; }
     .world__col { flex: 1 1 calc(50% - 8px); padding-top: 12px; }
-    .world__region { font-size: 18px; }
+    .world__region { font-size: 16px; }
     .world__list { font-size: 13px; }
   }
 </style>

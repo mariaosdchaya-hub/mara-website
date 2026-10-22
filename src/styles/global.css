@@ -16,6 +16,13 @@
   --t-body: 16px;
   --t-small: 14px;
   --t-overline: 12px;
+  /* section scale (one for the whole page) */
+  --t-h2: 36px;      /* section titles */
+  --t-h3: 17px;      /* card titles, questions, list items */
+  --t-lead: 15px;    /* section intro next to a title */
+  --t-text: 15px;    /* running text */
+  --t-meta: 13px;    /* names, captions */
+  --sec-pad: 96px 56px;
 
   --gutter: 32px;
   --max: 1440px;
@@ -65,6 +72,10 @@ img { display: block; max-width: 100%; }
   letter-spacing: .04em;
   text-transform: uppercase;
 }
+
+.sec-label { margin: 0 0 16px; color: #6b6b70; font-size: 12px; font-weight: 400; line-height: 1.35; letter-spacing: .04em; text-transform: uppercase; }
+@media (max-width: 1100px) { :root { --sec-pad: 80px 32px; } }
+@media (max-width: 768px) { :root { --t-h2: 30px; --t-text: 15px; --sec-pad: 72px 16px; } }
 
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
