@@ -1,0 +1,295 @@
+---
+// Project calculator — Figma 4202:2885. Pricing model lives in src/scripts/calculator.ts.
+const types = [
+  { id: "landing", label: "Landing page" },
+  { id: "website", label: "Website" },
+  { id: "mvp", label: "Product / MVP" },
+  { id: "platform", label: "Complex platform" },
+];
+const groups = [
+  {
+    id: "design",
+    title: "Design",
+    text: "We create products that fit your goals",
+    on: true,
+    options: [
+      { id: "flows", label: "User flows" },
+      { id: "wireframes", label: "Wireframes" },
+      { id: "ui", label: "UI design", checked: true },
+      { id: "ux", label: "UX design", checked: true },
+    ],
+  },
+  {
+    id: "dev",
+    title: "Development",
+    text: "Well-organized website enhancing the user experience",
+    on: false,
+    options: [
+      { id: "nocode", label: "No-code build", hint: "Framer / Webflow", group: "build", checked: true },
+      { id: "custom", label: "Custom front-end", group: "build" },
+      { id: "cms", label: "CMS & integrations" },
+    ],
+  },
+  {
+    id: "opt",
+    title: "Optimization",
+    text: "Optimizing your website, generating organic traffic",
+    on: false,
+    options: [
+      { id: "seo", label: "SEO setup", checked: true },
+      { id: "analytics", label: "Analytics" },
+      { id: "cro", label: "CRO audit" },
+      { id: "perf", label: "Performance" },
+    ],
+  },
+];
+---
+<section class="calc" id="calculator" data-calc>
+  <div class="calc__inner">
+    <div class="calc__head">
+      <h2 class="calc__title" data-split>
+        <span class="line"><span>Calculate the cost</span></span>
+        <span class="line"><span>of the project</span></span>
+      </h2>
+      <p class="calc__lead">By selecting the options below, you can see <br />the approximate cost of developing your project.</p>
+    </div>
+
+    <div class="calc__body">
+      <form class="calc__form" data-calc-form onsubmit="return false">
+        <fieldset class="calc__types">
+          <legend class="calc__legend">What are we building?</legend>
+          <div class="types">
+            {types.map((t, i) => (
+              <label class="type">
+                <input type="radio" name="type" value={t.id} checked={t.id === "mvp"} />
+                <span>{t.label}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        {groups.map((g) => (
+          <fieldset class:list={["group", { "is-on": g.on }]} data-group={g.id} aria-label={g.title}>
+            <div class="group__head">
+              <h3 class="group__title">{g.title}</h3>
+              <label class="switch">
+                <input type="checkbox" class="switch__input" data-switch checked={g.on} aria-label={`Include ${g.title}`} />
+                <span class="switch__track" aria-hidden="true"><span class="switch__knob"></span></span>
+              </label>
+            </div>
+            <p class="group__text">{g.text}</p>
+            <div class="group__options" data-options>
+              <div class="chips">
+                {g.options.map((o) => (
+                  <label class="chip">
+                    <input type="checkbox" name={o.id} value={o.id} data-opt data-exclusive={o.group} checked={!!o.checked} />
+                    <span class="chip__label">{o.label}{o.hint && <span class="chip__hint">{o.hint}</span>}</span>
+                    <span class="chip__box" aria-hidden="true">
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6.2l2.3 2.3 4.7-5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </fieldset>
+        ))}
+      </form>
+
+      <aside class="result" aria-live="polite">
+        <div class="result__top">
+          <p class="result__overline">Estimate</p>
+          <p class="result__title">Your project,<br />ballparked.</p>
+        </div>
+        <div class="result__bottom">
+          <div class="result__price">
+            <p class="result__label">Estimated range for selected options</p>
+            <p class="result__value" data-calc-price>$5k–$9k</p>
+            <p class="result__meta" data-calc-time>≈ 4–6 weeks</p>
+          </div>
+          <a href="#contact" class="result__btn" data-calc-cta>Discuss project</a>
+          <p class="result__note">Ballpark, not a quote. Final price after a short call.</p>
+        </div>
+        <span class="corner corner--tl" aria-hidden="true"></span>
+        <span class="corner corner--tr" aria-hidden="true"></span>
+        <span class="corner corner--bl" aria-hidden="true"></span>
+        <span class="corner corner--br" aria-hidden="true"></span>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  .calc { position: relative; z-index: 1; background: #fff; color: #0d221a; }
+  .calc__inner { max-width: 1440px; margin: 0 auto; padding: 96px 56px; display: flex; flex-direction: column; gap: 48px; }
+  .calc__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; }
+  .calc__title { margin: 0; font-size: 48px; font-weight: 400; line-height: 1; letter-spacing: -0.02em; }
+  .line { display: block; overflow: hidden; padding-bottom: .08em; margin-bottom: -.08em; }
+  .line > span { display: inline-block; }
+  .calc__lead { margin: 0; color: #6b6b70; font-size: 18px; line-height: 1.5; }
+
+  .calc__body { display: flex; gap: 40px; align-items: stretch; }
+  .calc__form { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
+  fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
+
+  /* project type */
+  .calc__types { padding-bottom: 32px; border-bottom: 1px solid #e6e6e9; }
+  .calc__legend { padding: 0; margin-bottom: 14px; font-size: 14px; font-weight: 500; color: #6b6b70; }
+  .types { display: flex; flex-wrap: wrap; gap: 8px; }
+  .type { position: relative; cursor: pointer; }
+  .type input { position: absolute; opacity: 0; pointer-events: none; }
+  .type span {
+    display: inline-flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 16px;
+    border: 1px solid #e6e6e9;
+    border-radius: 4px;
+    background: #f7f7f8;
+    font-size: 15px;
+    font-weight: 500;
+    color: #141414;
+    transition: background-color .2s, color .2s, border-color .2s;
+  }
+  .type:hover span { border-color: #c9cbcf; }
+  .type input:checked + span { background: #141414; border-color: #141414; color: #fff; }
+  .type input:focus-visible + span { outline: 2px solid #79f2ff; outline-offset: 2px; }
+
+  /* groups */
+  .group { padding: 32px 0; border-bottom: 1px solid #e6e6e9; }
+  .group__head { display: flex; align-items: center; gap: 14px; }
+  .group__title { margin: 0; font-size: 24px; font-weight: 500; line-height: 1.25; letter-spacing: -0.005em; color: #141414; }
+  .group__text { margin: 10px 0 0; font-size: 16px; line-height: 1.5; color: #616166; }
+
+  .switch { position: relative; display: inline-flex; cursor: pointer; }
+  .switch__input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .switch__track {
+    display: flex;
+    align-items: center;
+    width: 44px;
+    height: 24px;
+    padding: 3px;
+    border-radius: 4px;
+    background: #d6d6d9;
+    transition: background-color .25s ease;
+  }
+  .switch__knob {
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .18);
+    transition: transform .25s cubic-bezier(.2, .7, .2, 1);
+  }
+  .switch__input:checked + .switch__track { background: #141414; }
+  .switch__input:checked + .switch__track .switch__knob { transform: translateX(20px); box-shadow: none; }
+  .switch__input:focus-visible + .switch__track { outline: 2px solid #79f2ff; outline-offset: 2px; }
+
+  /* options collapse when the group is off */
+  .group__options { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s ease, opacity .25s ease; opacity: 0; }
+  .group__options > .chips { overflow: hidden; min-height: 0; }
+  .group.is-on .group__options { grid-template-rows: 1fr; opacity: 1; }
+  .chips { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; padding-top: 0; }
+  .group.is-on .chips { padding-top: 24px; }
+  .chip {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 48px;
+    padding: 8px 14px 8px 20px;
+    border: 1px solid #e6e6e9;
+    border-radius: 4px;
+    background: #f7f7f8;
+    cursor: pointer;
+    transition: border-color .2s;
+  }
+  .chip:hover { border-color: #c9cbcf; }
+  .chip input { position: absolute; opacity: 0; pointer-events: none; }
+  .chip__label { display: flex; flex-direction: column; font-size: 16px; font-weight: 500; line-height: 1.3; color: #141414; }
+  .chip__hint { font-size: 12px; font-weight: 400; color: #6b6b70; }
+  .chip__box {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border: 1.5px solid #e6e6e9;
+    border-radius: 3px;
+    background: #fff;
+    transition: background-color .2s, border-color .2s;
+  }
+  .chip__box svg { opacity: 0; transform: scale(.6); transition: opacity .2s, transform .2s; }
+  .chip input:checked ~ .chip__box { background: #141414; border-color: #141414; }
+  .chip input:checked ~ .chip__box svg { opacity: 1; transform: scale(1); }
+  .chip input:focus-visible ~ .chip__box { outline: 2px solid #79f2ff; outline-offset: 2px; }
+
+  /* result */
+  .result {
+    position: relative;
+    flex: 0 0 440px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 48px;
+    padding: 36px;
+    background: #141414;
+    color: #fff;
+  }
+  .result__overline { margin: 0 0 16px; color: #79f2ff; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
+  .result__title { margin: 0; font-size: 24px; font-weight: 500; line-height: 1.25; letter-spacing: -0.005em; }
+  .result__bottom { display: flex; flex-direction: column; align-items: flex-start; gap: 20px; }
+  .result__price { display: flex; flex-direction: column; gap: 6px; }
+  .result__label { margin: 0; color: #9ea3ab; font-size: 14px; line-height: 1.45; }
+  .result__value { margin: 0; font-size: 48px; line-height: 1; letter-spacing: -0.02em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .result__meta { margin: 4px 0 0; color: #9ea3ab; font-size: 14px; }
+  .result__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    padding: 0 28px;
+    border-radius: 4px;
+    background: #fff;
+    color: #1a1a1a;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color .2s;
+  }
+  .result__btn:hover { background: #79f2ff; }
+  .result__note { margin: 0; color: #6b6f76; font-size: 12px; }
+  .corner { position: absolute; width: 12px; height: 12px; background: #79f2ff; }
+  .corner--tl { left: -6px; top: -6px; }
+  .corner--tr { right: -6px; top: -6px; }
+  .corner--bl { left: -6px; bottom: -6px; }
+  .corner--br { right: -6px; bottom: -6px; }
+
+  @media (max-width: 1100px) {
+    .calc__inner { padding: 80px 32px; }
+    .calc__head { flex-direction: column; gap: 16px; }
+    .calc__body { flex-direction: column; }
+    .result { flex-basis: auto; }
+    .chips { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 768px) {
+    .calc__inner { padding: 72px 16px; gap: 32px; }
+    .calc__title { font-size: 36px; }
+    .calc__lead { font-size: 15px; }
+    .calc__lead br { display: none; }
+    .group { padding: 24px 0; }
+    .group__title { font-size: 20px; }
+    .group__text { font-size: 14px; }
+    .chips { gap: 8px; }
+    .group.is-on .chips { padding-top: 18px; }
+    .chip { padding: 8px 10px 8px 14px; }
+    .chip__label { font-size: 14px; }
+    .result { padding: 28px 24px; gap: 32px; }
+    .result__value { font-size: 40px; }
+  }
+</style>
+
+<script>
+  import { initCalculator } from "../scripts/calculator";
+  const cleanup = initCalculator();
+  document.addEventListener("astro:before-swap", () => cleanup?.(), { once: true });
+</script>
